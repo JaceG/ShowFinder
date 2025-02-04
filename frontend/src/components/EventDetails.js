@@ -15,6 +15,7 @@ import WeatherWidget from './WeatherWidget';
 import VenueMap from './VenueMap';
 import SpotifyTracks from './SpotifyTracks';
 import SpotifyArtistInfo from './SpotifyArtistInfo';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 const API_URL =
 	process.env.NODE_ENV === 'production'
@@ -114,9 +115,35 @@ function EventDetails({ event, onBack }) {
 									event.dates.start.localDate
 								).toLocaleDateString()}
 							</Typography>
-							<Typography variant='body2'>
+							<Typography variant='body2' gutterBottom>
 								{event._embedded?.venues?.[0]?.name}
 							</Typography>
+
+							{/* Add Ticket Purchase Button */}
+							{event.url && (
+								<Button
+									variant='contained'
+									color='primary'
+									startIcon={<ShoppingCartIcon />}
+									href={event.url}
+									target='_blank'
+									rel='noopener noreferrer'
+									fullWidth
+									sx={{ mt: 2 }}>
+									Buy Tickets
+								</Button>
+							)}
+
+							{/* Add Price Range if available */}
+							{event.priceRanges && (
+								<Typography
+									variant='body2'
+									color='text.secondary'
+									sx={{ mt: 1 }}>
+									Price Range: ${event.priceRanges[0]?.min} -
+									${event.priceRanges[0]?.max}
+								</Typography>
+							)}
 						</Box>
 					</Card>
 

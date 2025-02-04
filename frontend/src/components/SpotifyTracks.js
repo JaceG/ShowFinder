@@ -58,7 +58,7 @@ function SpotifyTracks({ artistName }) {
 				audio.src = '';
 			}
 		};
-	}, [artistName]);
+	}, [artistName, audio]);
 
 	const handlePlay = (track) => {
 		if (!track.previewUrl) return;
