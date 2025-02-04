@@ -8,6 +8,6 @@ router.get('/test', (req, res) => {
 });
 
 // Events search route
-router.get('/search', getEvents);
+router.get('/', getEvents);
 
 module.exports = router;

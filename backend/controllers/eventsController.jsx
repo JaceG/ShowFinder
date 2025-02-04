@@ -27,10 +27,7 @@ const getEvents = async (req, res) => {
 
 		console.log('Making request to Ticketmaster API:', {
 			url: apiUrl,
-			params: {
-				city,
-				classificationName: 'music',
-			},
+			params: { city },
 		});
 
 		const response = await axios({
@@ -38,10 +35,11 @@ const getEvents = async (req, res) => {
 			url: apiUrl,
 			params: {
 				apikey: apiKey,
-				city: city,
+				keyword: city,
 				classificationName: 'music',
 				sort: 'date,asc',
 				size: 50,
+				startDateTime: new Date().toISOString().slice(0, 19) + 'Z',
 			},
 		});
 
