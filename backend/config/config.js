@@ -12,4 +12,8 @@ module.exports = {
 		apiKey: process.env.OPENWEATHER_API_KEY,
 	},
 	nodeEnv: process.env.NODE_ENV || 'development',
+	spotify: {
+		clientId: process.env.SPOTIFY_CLIENT_ID,
+		clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+	},
 };

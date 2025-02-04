@@ -55,4 +55,5 @@ const searchYouTube = async (req, res) => {
 
 module.exports = {
 	searchYouTube,
+	// We can add other Google API methods here later
 };
