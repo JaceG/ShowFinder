@@ -9,7 +9,6 @@ import {
 	Button,
 	CircularProgress,
 	Alert,
-	Divider,
 } from '@mui/material';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import WeatherWidget from './WeatherWidget';

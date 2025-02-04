@@ -17,8 +17,9 @@ app.use((req, res, next) => {
 			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
 			"font-src 'self' https://fonts.gstatic.com; " +
 			"img-src 'self' data: https:; " +
-			"script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-			"connect-src 'self' https://app.ticketmaster.com;"
+			"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com; " +
+			"frame-src 'self' https://www.youtube.com; " +
+			"connect-src 'self' https://app.ticketmaster.com https://*.googleapis.com https://openweathermap.org;"
 	);
 	next();
 });

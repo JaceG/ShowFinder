@@ -103,7 +103,7 @@ function WeatherWidget({ venue, eventDate }) {
 
 				<Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
 					<img
-						src={`http://openweathermap.org/img/w/${weather.icon}.png`}
+						src={`https://openweathermap.org/img/w/${weather.icon}.png`}
 						alt={weather.description}
 						style={{
 							marginRight: '8px',
