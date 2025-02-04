@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3333/api';
+const API_BASE_URL =
+	process.env.NODE_ENV === 'production'
+		? '/api' // Use relative path in production
+		: 'http://localhost:3333/api';
 
 export const searchEvents = async (city) => {
 	try {

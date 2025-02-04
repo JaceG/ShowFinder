@@ -5,11 +5,21 @@ const getEvents = async (req, res) => {
 	try {
 		const { city } = req.query;
 		console.log('Received request for city:', city);
+		console.log(
+			'API Key:',
+			config.ticketmaster.apiKey ? 'Present' : 'Missing'
+		);
 
 		if (!city) {
 			return res
 				.status(400)
 				.json({ error: 'City parameter is required' });
+		}
+
+		if (!config.ticketmaster.apiKey) {
+			return res
+				.status(500)
+				.json({ error: 'Ticketmaster API key is not configured' });
 		}
 
 		const apiUrl = 'https://app.ticketmaster.com/discovery/v2/events.json';
@@ -39,11 +49,13 @@ const getEvents = async (req, res) => {
 		console.log('Search successful, found:', events.length, 'events');
 		res.json({ events });
 	} catch (error) {
-		console.error('Error details:', {
+		console.error('Error in getEvents:', {
 			message: error.message,
-			status: error.response?.status,
-			data: error.response?.data,
-			headers: error.response?.headers,
+			stack: error.stack,
+			response: {
+				status: error.response?.status,
+				data: error.response?.data,
+			},
 		});
 
 		res.status(error.response?.status || 500).json({

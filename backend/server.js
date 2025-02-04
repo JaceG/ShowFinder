@@ -24,7 +24,10 @@ app.use((req, res, next) => {
 // CORS middleware
 app.use(
 	cors({
-		origin: 'http://localhost:3000',
+		origin:
+			process.env.NODE_ENV === 'production'
+				? true // Allow all origins in production
+				: 'http://localhost:3000',
 		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 		allowedHeaders: ['Content-Type', 'Authorization'],
 		credentials: true,
