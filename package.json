@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Local Concert Search Tool",
   "scripts": {
-    "start": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\"",
+    "start": "concurrently \"cd backend && npm run dev\" \"cd frontend && PORT=3000 npm start\"",
     "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
   "devDependencies": {

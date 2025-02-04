@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 const eventsRouter = require('./routes/events');
 const path = require('path');
+const youtubeRouter = require('./routes/youtube');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -47,6 +48,7 @@ app.get('/api/health', (req, res) => {
 
 // Events routes
 app.use('/api/events', eventsRouter);
+app.use('/api/youtube', youtubeRouter);
 
 // Handle all other routes by serving the React app
 app.get('*', (req, res) => {

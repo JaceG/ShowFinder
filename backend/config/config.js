@@ -5,5 +5,8 @@ module.exports = {
 	ticketmaster: {
 		apiKey: process.env.TICKETMASTER_API_KEY,
 	},
+	youtube: {
+		apiKey: process.env.YOUTUBE_API_KEY,
+	},
 	nodeEnv: process.env.NODE_ENV || 'development',
 };

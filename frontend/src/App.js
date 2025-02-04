@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { searchEvents } from './api/eventbriteApi';
+import { searchEvents } from './api/ticketmasterApi';
+import EventDetails from './components/EventDetails';
 import {
 	Container,
 	TextField,
@@ -14,7 +15,16 @@ import {
 	Select,
 	MenuItem,
 	Box,
+	Chip,
+	CardActions,
+	Collapse,
+	IconButton,
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 function App() {
 	const [city, setCity] = useState('');
@@ -23,6 +33,15 @@ function App() {
 	const [error, setError] = useState(null);
 	const [sortBy, setSortBy] = useState('date');
 	const [genreFilter, setGenreFilter] = useState('all');
+	const [expanded, setExpanded] = useState({});
+	const [selectedEvent, setSelectedEvent] = useState(null);
+
+	const handleExpandClick = (eventId) => {
+		setExpanded({
+			...expanded,
+			[eventId]: !expanded[eventId],
+		});
+	};
 
 	const handleSearch = async (e) => {
 		e.preventDefault();
@@ -59,6 +78,15 @@ function App() {
 			}
 			return 0;
 		});
+
+	if (selectedEvent) {
+		return (
+			<EventDetails
+				event={selectedEvent}
+				onBack={() => setSelectedEvent(null)}
+			/>
+		);
+	}
 
 	return (
 		<Container maxWidth='lg' sx={{ py: 4 }}>
@@ -176,39 +204,144 @@ function App() {
 									component='h2'>
 									{event.name}
 								</Typography>
-								<Typography
-									variant='body2'
-									color='text.secondary'
-									gutterBottom>
-									{new Date(
-										event.dates.start.localDate
-									).toLocaleDateString()}{' '}
-									at {event.dates.start.localTime || 'TBA'}
-								</Typography>
-								<Typography
-									variant='body2'
-									color='text.secondary'
-									gutterBottom>
-									{event._embedded?.venues?.[0]?.name}
-								</Typography>
-								{event.priceRanges && (
+								<Box
+									sx={{
+										display: 'flex',
+										alignItems: 'center',
+										mb: 1,
+									}}>
+									<CalendarTodayIcon
+										sx={{ mr: 1, fontSize: 'small' }}
+									/>
 									<Typography
 										variant='body2'
 										color='text.secondary'>
-										Price: ${event.priceRanges[0].min} - $
-										{event.priceRanges[0].max}
+										{new Date(
+											event.dates.start.localDate
+										).toLocaleDateString()}{' '}
+										at{' '}
+										{event.dates.start.localTime || 'TBA'}
 									</Typography>
+								</Box>
+								<Box
+									sx={{
+										display: 'flex',
+										alignItems: 'center',
+										mb: 1,
+									}}>
+									<LocationOnIcon
+										sx={{ mr: 1, fontSize: 'small' }}
+									/>
+									<Typography
+										variant='body2'
+										color='text.secondary'>
+										{event._embedded?.venues?.[0]?.name},{' '}
+										{
+											event._embedded?.venues?.[0]?.city
+												?.name
+										}
+									</Typography>
+								</Box>
+								<Box sx={{ mt: 2, mb: 1 }}>
+									{event.classifications?.[0]?.genre && (
+										<Chip
+											label={
+												event.classifications[0].genre
+													.name
+											}
+											size='small'
+											sx={{ mr: 0.5, mb: 0.5 }}
+										/>
+									)}
+									{event.family && (
+										<Chip
+											icon={<FamilyRestroomIcon />}
+											label='Family Friendly'
+											size='small'
+											sx={{ mr: 0.5, mb: 0.5 }}
+										/>
+									)}
+								</Box>
+								{event.priceRanges && (
+									<Box
+										sx={{
+											display: 'flex',
+											alignItems: 'center',
+											mb: 1,
+										}}>
+										<LocalOfferIcon
+											sx={{ mr: 1, fontSize: 'small' }}
+										/>
+										<Typography
+											variant='body2'
+											color='text.secondary'>
+											${event.priceRanges[0].min} - $
+											{event.priceRanges[0].max}
+										</Typography>
+									</Box>
 								)}
+							</CardContent>
+							<CardActions>
 								<Button
 									href={event.url}
 									target='_blank'
 									rel='noopener noreferrer'
 									variant='contained'
-									sx={{ mt: 2 }}
-									fullWidth>
+									size='small'>
 									Get Tickets
 								</Button>
-							</CardContent>
+								<Button
+									onClick={() => setSelectedEvent(event)}
+									variant='outlined'
+									size='small'>
+									More Details
+								</Button>
+								<IconButton
+									onClick={() => handleExpandClick(event.id)}
+									aria-expanded={expanded[event.id]}
+									aria-label='show more'>
+									<ExpandMoreIcon />
+								</IconButton>
+							</CardActions>
+							<Collapse
+								in={expanded[event.id]}
+								timeout='auto'
+								unmountOnExit>
+								<CardContent>
+									{event.pleaseNote && (
+										<Typography paragraph>
+											<strong>Note:</strong>{' '}
+											{event.pleaseNote}
+										</Typography>
+									)}
+									{event._embedded?.venues?.[0]
+										?.generalInfo && (
+										<Typography paragraph>
+											<strong>Venue Info:</strong>{' '}
+											{
+												event._embedded.venues[0]
+													.generalInfo.generalRule
+											}
+										</Typography>
+									)}
+									{event._embedded?.venues?.[0]
+										?.parkingDetail && (
+										<Typography paragraph>
+											<strong>Parking:</strong>{' '}
+											{
+												event._embedded.venues[0]
+													.parkingDetail
+											}
+										</Typography>
+									)}
+									{event.accessibility && (
+										<Typography paragraph>
+											<strong>Accessibility:</strong>{' '}
+											{event.accessibility.info}
+										</Typography>
+									)}
+								</CardContent>
+							</Collapse>
 						</Card>
 					</Grid>
 				))}
