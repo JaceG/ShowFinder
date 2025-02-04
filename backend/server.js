@@ -4,9 +4,10 @@ require('dotenv').config();
 const eventsRouter = require('./routes/events');
 const path = require('path');
 const youtubeRouter = require('./routes/youtube');
+const weatherRouter = require('./routes/weather');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3333;
 
 // Add CSP headers middleware before other middleware
 app.use((req, res, next) => {
@@ -49,6 +50,7 @@ app.get('/api/health', (req, res) => {
 // Events routes
 app.use('/api/events', eventsRouter);
 app.use('/api/youtube', youtubeRouter);
+app.use('/api/weather', weatherRouter);
 
 // Handle all other routes by serving the React app
 app.get('*', (req, res) => {

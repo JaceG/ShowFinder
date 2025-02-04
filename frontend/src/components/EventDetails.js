@@ -11,6 +11,7 @@ import {
 	Alert,
 } from '@mui/material';
 import YouTubeIcon from '@mui/icons-material/YouTube';
+import WeatherWidget from './WeatherWidget';
 
 const API_URL =
 	process.env.NODE_ENV === 'production'
@@ -86,6 +87,14 @@ function EventDetails({ event, onBack }) {
 							</Typography>
 						</Box>
 					</Card>
+
+					{/* Add Weather Widget */}
+					{event._embedded?.venues?.[0] && (
+						<WeatherWidget
+							venue={event._embedded.venues[0]}
+							eventDate={event.dates.start.localDate}
+						/>
+					)}
 				</Grid>
 
 				<Grid item xs={12} md={6}>
