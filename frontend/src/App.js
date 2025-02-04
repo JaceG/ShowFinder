@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { searchEvents } from './api/ticketmasterApi';
-import EventDetails from './components/EventDetails';
+import EventDetails from './Components/EventDetails';
 import {
 	Container,
 	TextField,
