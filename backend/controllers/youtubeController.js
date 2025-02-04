@@ -9,11 +9,11 @@ const searchYouTube = async (req, res) => {
 			return res.status(400).json({ error: 'Search query is required' });
 		}
 
-		if (!config.youtube.apiKey) {
-			console.error('YouTube API key is missing');
+		if (!config.google.apiKey) {
+			console.error('Google API key is missing');
 			return res
 				.status(500)
-				.json({ error: 'YouTube API key is not configured' });
+				.json({ error: 'Google API key is not configured' });
 		}
 
 		console.log('Searching YouTube for:', q);
@@ -26,7 +26,7 @@ const searchYouTube = async (req, res) => {
 					maxResults: 3,
 					q: `${q} live performance`,
 					type: 'video',
-					key: config.youtube.apiKey,
+					key: config.google.apiKey,
 				},
 			}
 		);
@@ -42,12 +42,11 @@ const searchYouTube = async (req, res) => {
 		console.log('Found videos:', videos.length);
 		res.json({ videos });
 	} catch (error) {
-		console.error('YouTube API Error:', {
-			message: error.message,
-			response: error.response?.data,
-			status: error.response?.status,
-		});
-		res.status(error.response?.status || 500).json({
+		console.error(
+			'YouTube API Error:',
+			error.response?.data || error.message
+		);
+		res.status(500).json({
 			error: 'Failed to fetch YouTube videos',
 			details: error.response?.data || error.message,
 		});

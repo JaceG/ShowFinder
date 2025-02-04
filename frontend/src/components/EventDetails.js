@@ -9,9 +9,11 @@ import {
 	Button,
 	CircularProgress,
 	Alert,
+	Divider,
 } from '@mui/material';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import WeatherWidget from './WeatherWidget';
+import VenueMap from './VenueMap';
 
 const API_URL =
 	process.env.NODE_ENV === 'production'
@@ -94,6 +96,11 @@ function EventDetails({ event, onBack }) {
 							venue={event._embedded.venues[0]}
 							eventDate={event.dates.start.localDate}
 						/>
+					)}
+
+					{/* Venue Map */}
+					{event._embedded?.venues?.[0] && (
+						<VenueMap venue={event._embedded.venues[0]} />
 					)}
 				</Grid>
 
