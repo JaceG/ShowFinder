@@ -3,10 +3,12 @@ const cors = require('cors');
 require('dotenv').config();
 const eventsRouter = require('./routes/events');
 const path = require('path');
-const youtubeRouter = require('./routes/youtube');
+const googleRouter = require('./routes/google');
+const weatherRouter = require('./routes/weather');
+const spotifyRouter = require('./routes/spotify');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3333;
 
 // Add CSP headers middleware before other middleware
 app.use((req, res, next) => {
@@ -16,8 +18,9 @@ app.use((req, res, next) => {
 			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
 			"font-src 'self' https://fonts.gstatic.com; " +
 			"img-src 'self' data: https:; " +
-			"script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-			"connect-src 'self' https://app.ticketmaster.com;"
+			"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com; " +
+			"frame-src 'self' https://www.youtube.com; " +
+			"connect-src 'self' https://app.ticketmaster.com https://*.googleapis.com https://openweathermap.org;"
 	);
 	next();
 });
@@ -48,7 +51,9 @@ app.get('/api/health', (req, res) => {
 
 // Events routes
 app.use('/api/events', eventsRouter);
-app.use('/api/youtube', youtubeRouter);
+app.use('/api/google', googleRouter);
+app.use('/api/weather', weatherRouter);
+app.use('/api/spotify', spotifyRouter);
 
 // Handle all other routes by serving the React app
 app.get('*', (req, res) => {

@@ -11,6 +11,11 @@ import {
 	Alert,
 } from '@mui/material';
 import YouTubeIcon from '@mui/icons-material/YouTube';
+import WeatherWidget from './WeatherWidget';
+import VenueMap from './VenueMap';
+import SpotifyTracks from './SpotifyTracks';
+import SpotifyArtistInfo from './SpotifyArtistInfo';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 const API_URL =
 	process.env.NODE_ENV === 'production'
@@ -21,13 +26,16 @@ function EventDetails({ event, onBack }) {
 	const [videos, setVideos] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [spotifyArtistId, setSpotifyArtistId] = useState(null);
 
 	useEffect(() => {
 		const fetchVideos = async () => {
 			try {
 				console.log('Fetching videos for:', event.name);
 				const response = await fetch(
-					`${API_URL}/youtube?q=${encodeURIComponent(event.name)}`,
+					`${API_URL}/google/youtube?q=${encodeURIComponent(
+						event.name
+					)}`,
 					{
 						headers: {
 							Accept: 'application/json',
@@ -53,6 +61,32 @@ function EventDetails({ event, onBack }) {
 		};
 
 		fetchVideos();
+	}, [event.name]);
+
+	useEffect(() => {
+		const fetchSpotifyArtist = async () => {
+			try {
+				const response = await fetch(
+					`${API_URL}/spotify/search?q=${encodeURIComponent(
+						event.name
+					)}`
+				);
+
+				if (!response.ok) {
+					throw new Error('Failed to fetch Spotify artist');
+				}
+
+				const data = await response.json();
+				if (data.artistId) {
+					setSpotifyArtistId(data.artistId);
+				}
+			} catch (err) {
+				console.error('Error fetching Spotify artist:', err);
+				// Don't set error state as this is optional
+			}
+		};
+
+		fetchSpotifyArtist();
 	}, [event.name]);
 
 	return (
@@ -81,14 +115,61 @@ function EventDetails({ event, onBack }) {
 									event.dates.start.localDate
 								).toLocaleDateString()}
 							</Typography>
-							<Typography variant='body2'>
+							<Typography variant='body2' gutterBottom>
 								{event._embedded?.venues?.[0]?.name}
 							</Typography>
+
+							{/* Add Ticket Purchase Button */}
+							{event.url && (
+								<Button
+									variant='contained'
+									color='primary'
+									startIcon={<ShoppingCartIcon />}
+									href={event.url}
+									target='_blank'
+									rel='noopener noreferrer'
+									fullWidth
+									sx={{ mt: 2 }}>
+									Buy Tickets
+								</Button>
+							)}
+
+							{/* Add Price Range if available */}
+							{event.priceRanges && (
+								<Typography
+									variant='body2'
+									color='text.secondary'
+									sx={{ mt: 1 }}>
+									Price Range: ${event.priceRanges[0]?.min} -
+									${event.priceRanges[0]?.max}
+								</Typography>
+							)}
 						</Box>
 					</Card>
+
+					{/* Spotify Artist Info */}
+					{spotifyArtistId && (
+						<SpotifyArtistInfo artistId={spotifyArtistId} />
+					)}
+
+					{/* Weather Widget */}
+					{event._embedded?.venues?.[0] && (
+						<WeatherWidget
+							venue={event._embedded.venues[0]}
+							eventDate={event.dates.start.localDate}
+						/>
+					)}
+
+					{/* Venue Map */}
+					{event._embedded?.venues?.[0] && (
+						<VenueMap venue={event._embedded.venues[0]} />
+					)}
 				</Grid>
 
 				<Grid item xs={12} md={6}>
+					{/* Spotify Tracks */}
+					<SpotifyTracks artistName={event.name} />
+
 					{/* YouTube Videos */}
 					<Typography variant='h6' gutterBottom>
 						<YouTubeIcon sx={{ mr: 1 }} />

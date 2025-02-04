@@ -5,8 +5,15 @@ module.exports = {
 	ticketmaster: {
 		apiKey: process.env.TICKETMASTER_API_KEY,
 	},
-	youtube: {
-		apiKey: process.env.YOUTUBE_API_KEY,
+	google: {
+		apiKey: process.env.GOOGLE_API_KEY,
+	},
+	weather: {
+		apiKey: process.env.OPENWEATHER_API_KEY,
 	},
 	nodeEnv: process.env.NODE_ENV || 'development',
+	spotify: {
+		clientId: process.env.SPOTIFY_CLIENT_ID,
+		clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+	},
 };

@@ -40,6 +40,8 @@ const getEvents = async (req, res) => {
 				sort: 'date,asc',
 				size: 50,
 				startDateTime: new Date().toISOString().slice(0, 19) + 'Z',
+				includeVenues: true,
+				expandVenues: true,
 			},
 		});
 
