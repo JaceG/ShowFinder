@@ -14,18 +14,20 @@ ShowFinder is a full-stack application that allows users to search for local mus
 
 ## Project Structure 
 
+```
 ShowFinder/
-├── backend/ # Node.js & Express backend
-│ ├── controllers/ # API call handlers
-│ ├── routes/ # Backend routes
-│ ├── config/ # Environment variables
-│ └── server.js # Express app entry point
-└── frontend/ # React frontend
-├── src/
-│ ├── components/ # UI components
-│ ├── pages/ # Main pages
-│ └── api/ # API integration
-└── public/ # Static files
+├── backend/                # Node.js & Express backend
+│   ├── controllers/        # API call handlers
+│   ├── routes/            # Backend routes
+│   ├── config/            # Environment variables
+│   └── server.js          # Express app entry point
+└── frontend/              # React frontend
+    ├── src/
+    │   ├── components/    # UI components
+    │   ├── pages/         # Main pages
+    │   └── api/           # API integration
+    └── public/            # Static files
+```
 
 ## Getting Started
 
@@ -38,25 +40,17 @@ ShowFinder/
 ### Installation
 
 1. Clone the repository:
-
 ```bash
-git clone https://github.com/yourusername/ShowFinder.git
+git clone https://github.com/JaceG/ShowFinder.git
 cd ShowFinder
 ```
 
-2. Install backend dependencies:
+2. Install all dependencies (frontend, backend, and root):
 ```bash
-cd backend
-npm install
+npm run install-all
 ```
 
-3. Install frontend dependencies:
-```bash
-cd ../frontend
-npm install
-```
-
-4. Create a `.env` file in the backend directory with your API keys:
+3. Create a `.env` file in the backend directory with your API keys:
 ```
 PORT=5000
 EVENTBRITE_API_KEY=your_api_key_here
@@ -64,6 +58,17 @@ NODE_ENV=development
 ```
 
 ### Running the Application
+
+You can start both frontend and backend servers with a single command:
+```bash
+npm start
+```
+
+This will run:
+- Backend server on `http://localhost:5000`
+- Frontend development server on `http://localhost:3000`
+
+Alternatively, you can run the servers separately:
 
 1. Start the backend server:
 ```bash
@@ -76,8 +81,6 @@ npm run dev
 cd frontend
 npm start
 ```
-
-The application will be available at `http://localhost:3000`
 
 ## Features
 
