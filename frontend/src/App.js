@@ -62,9 +62,30 @@ function App() {
 
 	return (
 		<Container maxWidth='lg' sx={{ py: 4 }}>
-			<Typography variant='h2' component='h1' gutterBottom align='center'>
-				ShowFinder
-			</Typography>
+			<Box
+				sx={{
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					mb: 3,
+				}}>
+				<img
+					src='/logo512.png'
+					alt='ShowFinder Logo'
+					style={{
+						width: '120px',
+						height: '120px',
+						marginBottom: '1rem',
+					}}
+				/>
+				<Typography
+					variant='h2'
+					component='h1'
+					gutterBottom
+					align='center'>
+					ShowFinder
+				</Typography>
+			</Box>
 
 			<Box component='form' onSubmit={handleSearch} sx={{ mb: 4 }}>
 				<Grid
