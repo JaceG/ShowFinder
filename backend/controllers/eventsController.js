@@ -1,7 +1,5 @@
 const axios = require('axios');
 const config = require('../config/config');
-const User = require('../models/User');
-const SavedEvent = require('../models/SavedEvent');
 
 const getEvents = async (req, res) => {
 	try {
@@ -51,15 +49,7 @@ const getEvents = async (req, res) => {
 		console.log('Search successful, found:', events.length, 'events');
 		res.json({ events });
 	} catch (error) {
-		console.error('Error in getEvents:', {
-			message: error.message,
-			stack: error.stack,
-			response: {
-				status: error.response?.status,
-				data: error.response?.data,
-			},
-		});
-
+		console.error('Error in getEvents:', error);
 		res.status(error.response?.status || 500).json({
 			error: 'Error fetching events',
 			details: error.response?.data || error.message,
@@ -67,51 +57,10 @@ const getEvents = async (req, res) => {
 	}
 };
 
-const saveEvent = async (req, res) => {
-	try {
-		const userId = req.user.id;
-		const { eventId, eventData } = req.body;
-
-		const savedEvent = await SavedEvent.create({
-			userId,
-			eventId,
-			eventData
-		});
-
-		res.status(201).json({ message: 'Event saved successfully', savedEvent });
-	} catch (error) {
-		console.error('Error saving event:', error);
-		res.status(500).json({ error: 'Error saving event' });
-	}
-};
-
-const getSavedEvents = async (req, res) => {
-	try {
-		const userId = req.user.id;
-		const savedEvents = await SavedEvent.find({ userId });
-		res.json({ savedEvents });
-	} catch (error) {
-		console.error('Error fetching saved events:', error);
-		res.status(500).json({ error: 'Error fetching saved events' });
-	}
-};
-
-const removeSavedEvent = async (req, res) => {
-	try {
-		const userId = req.user.id;
-		const { eventId } = req.params;
-
-		await SavedEvent.findOneAndDelete({ userId, eventId });
-		res.json({ message: 'Event removed successfully' });
-	} catch (error) {
-		console.error('Error removing saved event:', error);
-		res.status(500).json({ error: 'Error removing saved event' });
-	}
-};
-
 module.exports = {
 	getEvents,
-	saveEvent,
-	getSavedEvents,
-	removeSavedEvent
+	// We'll add these back when we implement the full functionality
+	// saveEvent,
+	// getSavedEvents,
+	// removeSavedEvent
 };
