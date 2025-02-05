@@ -1,6 +1,10 @@
 import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { searchEvents } from './api/ticketmasterApi';
 import EventDetails from './components/EventDetails';
+import Navigation from './components/Navigation';
+import Login from './components/Login';
+import SignUp from './components/SignUp';
 import {
 	Container,
 	TextField,
@@ -29,7 +33,7 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useTheme } from './context/ThemeContext';
 
-function App() {
+function EventsPage() {
 	const [city, setCity] = useState('');
 	const [events, setEvents] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -384,6 +388,19 @@ function App() {
 				)}
 			</Container>
 		</Box>
+	);
+}
+
+function App() {
+	return (
+		<Router>
+			<Navigation />
+			<Routes>
+				<Route path="/" element={<EventsPage />} />
+				<Route path="/login" element={<Login />} />
+				<Route path="/signup" element={<SignUp />} />
+			</Routes>
+		</Router>
 	);
 }
 
