@@ -1,6 +1,10 @@
 import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { searchEvents } from './api/ticketmasterApi';
 import EventDetails from './components/EventDetails';
+import Navigation from './components/Navigation';
+import Login from './components/Login';
+import SignUp from './components/SignUp';
 import {
 	Container,
 	TextField,
@@ -26,7 +30,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
-function App() {
+function EventsPage() {
 	const [city, setCity] = useState('');
 	const [events, setEvents] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -351,6 +355,19 @@ function App() {
 				<Typography align='center'>No events found</Typography>
 			)}
 		</Container>
+	);
+}
+
+function App() {
+	return (
+		<Router>
+			<Navigation />
+			<Routes>
+				<Route path="/" element={<EventsPage />} />
+				<Route path="/login" element={<Login />} />
+				<Route path="/signup" element={<SignUp />} />
+			</Routes>
+		</Router>
 	);
 }
 
