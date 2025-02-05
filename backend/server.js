@@ -1,11 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const mongoose = require('mongoose');
 const eventsRouter = require('./routes/events');
 const path = require('path');
 const googleRouter = require('./routes/google');
 const weatherRouter = require('./routes/weather');
 const spotifyRouter = require('./routes/spotify');
+const userRouter = require('./routes/users');
 
 const app = express();
 const PORT = process.env.PORT || 3333;
@@ -44,6 +46,11 @@ app.use(express.json());
 // Serve static files from the React frontend app
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 
+// Update MongoDB connection
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eventapp')
+	.then(() => console.log('Connected to MongoDB'))
+	.catch(err => console.error('MongoDB connection error:', err));
+
 // Basic health check route
 app.get('/api/health', (req, res) => {
 	res.json({ status: 'OK' });
@@ -54,6 +61,7 @@ app.use('/api/events', eventsRouter);
 app.use('/api/google', googleRouter);
 app.use('/api/weather', weatherRouter);
 app.use('/api/spotify', spotifyRouter);
+app.use('/api/users', userRouter);
 
 // Handle all other routes by serving the React app
 app.get('*', (req, res) => {
