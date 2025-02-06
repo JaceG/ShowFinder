@@ -51,15 +51,7 @@ const getEvents = async (req, res) => {
 		console.log('Search successful, found:', events.length, 'events');
 		res.json({ events });
 	} catch (error) {
-		console.error('Error in getEvents:', {
-			message: error.message,
-			stack: error.stack,
-			response: {
-				status: error.response?.status,
-				data: error.response?.data,
-			},
-		});
-
+		console.error('Error in getEvents:', error);
 		res.status(error.response?.status || 500).json({
 			error: 'Error fetching events',
 			details: error.response?.data || error.message,
@@ -111,7 +103,8 @@ const removeSavedEvent = async (req, res) => {
 
 module.exports = {
 	getEvents,
-	saveEvent,
-	getSavedEvents,
-	removeSavedEvent
+	// We'll add these back when we implement the full functionality
+	// saveEvent,
+	// getSavedEvents,
+	// removeSavedEvent
 };
