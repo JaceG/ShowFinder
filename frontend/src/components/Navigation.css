@@ -7,13 +7,16 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.nav-brand a {
+.navigation .nav-brand a {
     font-size: 1.5rem;
     text-decoration: none;
-    color: #333;
+    color: #333 !important;  /* Force the dark color */
     font-weight: bold;
+    position: relative;       /* Create a stacking context */
+    z-index: 10;              /* Bring it above other elements if needed */
 }
 
+/* The nav-links and buttons remain unchanged */
 .nav-links {
     display: flex;
     gap: 1rem;
