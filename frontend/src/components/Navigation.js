@@ -14,14 +14,24 @@ const Navigation = () => {
 
     return (
         <nav className="navigation">
-            <div className="nav-brand">
-                <Link to="/">Event App</Link>
-            </div>
+            <Link 
+                to="/" 
+                className="nav-brand" 
+                style={{ 
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    color: 'inherit'
+                }}
+            >
+                Event App
+            </Link>
             <div className="nav-links">
                 {user ? (
                     <>
                         <Link to="/saved-events">My Saved Events</Link>
-                        <button onClick={handleLogout} className="logout-btn">Logout</button>
+                        <button onClick={handleLogout} className="logout-btn">
+                            Logout
+                        </button>
                     </>
                 ) : (
                     <>
@@ -34,4 +44,4 @@ const Navigation = () => {
     );
 };
 
-export default Navigation; 
+export default Navigation;

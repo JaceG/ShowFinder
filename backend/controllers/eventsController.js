@@ -62,7 +62,8 @@ const getEvents = async (req, res) => {
 const saveEvent = async (req, res) => {
 	try {
 		const userId = req.user.id;
-		const { eventId, eventData } = req.body;
+		const { eventData } = req.body;
+		console.log('Saving event:', { userId, eventData }); // Debug log
 
 		const savedEvent = await savedEvent.create({
 			userId,
@@ -76,7 +77,10 @@ const saveEvent = async (req, res) => {
 		});
 	} catch (error) {
 		console.error('Error saving event:', error);
-		res.status(500).json({ error: 'Error saving event' });
+		if (error.code === 11000) {
+			return res.status(400).json({ message: 'Event already saved' });
+		}
+		res.status(500).json({ message: 'Error saving event', error: error.message });
 	}
 };
 
@@ -87,7 +91,7 @@ const getSavedEvents = async (req, res) => {
 		res.json({ savedEvents });
 	} catch (error) {
 		console.error('Error fetching saved events:', error);
-		res.status(500).json({ error: 'Error fetching saved events' });
+		res.status(500).json({ message: 'Error fetching saved events', error: error.message });
 	}
 };
 
@@ -95,12 +99,18 @@ const removeSavedEvent = async (req, res) => {
 	try {
 		const userId = req.user.id;
 		const { eventId } = req.params;
+		console.log('Removing event:', { userId, eventId }); // Debug log
+
+		const result = await SavedEvent.findOneAndDelete({ userId, eventId });
+		if (!result) {
+			return res.status(404).json({ message: 'Event not found' });
+		}
 
 		await savedEvent.findOneAndDelete({ userId, eventId });
 		res.json({ message: 'Event removed successfully' });
 	} catch (error) {
 		console.error('Error removing saved event:', error);
-		res.status(500).json({ error: 'Error removing saved event' });
+		res.status(500).json({ message: 'Error removing event', error: error.message });
 	}
 };
 

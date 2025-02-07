@@ -4,7 +4,8 @@
   "description": "Local Concert Search Tool",
   "scripts": {
     "start": "concurrently \"cd backend && npm run dev\" \"cd frontend && PORT=3000 npm start\"",
-    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
