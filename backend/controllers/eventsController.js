@@ -1,7 +1,7 @@
 const axios = require('axios');
 const config = require('../config/config');
 const User = require('../models/User');
-const SavedEvent = require('../models/SavedEvent');
+const savedEvent = require('../models/savedEvent');
 
 const getEvents = async (req, res) => {
 	try {
@@ -65,15 +65,16 @@ const saveEvent = async (req, res) => {
 		const { eventData } = req.body;
 		console.log('Saving event:', { userId, eventData }); // Debug log
 
-		const savedEvent = new SavedEvent({
+		const savedEvent = await savedEvent.create({
 			userId,
-			eventId: eventData.id,
-			eventData
+			eventId,
+			eventData,
 		});
 
-		await savedEvent.save();
-		console.log('Event saved successfully:', savedEvent); // Debug log
-		res.status(201).json({ message: 'Event saved successfully', event: savedEvent });
+		res.status(201).json({
+			message: 'Event saved successfully',
+			savedEvent,
+		});
 	} catch (error) {
 		console.error('Error saving event:', error);
 		if (error.code === 11000) {
@@ -86,9 +87,7 @@ const saveEvent = async (req, res) => {
 const getSavedEvents = async (req, res) => {
 	try {
 		const userId = req.user.id;
-		console.log('Getting saved events for user:', userId); // Debug log
-		const savedEvents = await SavedEvent.find({ userId });
-		console.log('Found saved events:', savedEvents); // Debug log
+		const savedEvents = await savedEvent.find({ userId });
 		res.json({ savedEvents });
 	} catch (error) {
 		console.error('Error fetching saved events:', error);
@@ -107,7 +106,7 @@ const removeSavedEvent = async (req, res) => {
 			return res.status(404).json({ message: 'Event not found' });
 		}
 
-		console.log('Event removed successfully:', result); // Debug log
+		await savedEvent.findOneAndDelete({ userId, eventId });
 		res.json({ message: 'Event removed successfully' });
 	} catch (error) {
 		console.error('Error removing saved event:', error);
@@ -119,5 +118,5 @@ module.exports = {
 	getEvents,
 	saveEvent,
 	getSavedEvents,
-	removeSavedEvent
+	removeSavedEvent,
 };

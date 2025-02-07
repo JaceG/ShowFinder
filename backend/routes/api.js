@@ -12,6 +12,10 @@ router.post('/users/login', userController.login);
 // Protected routes
 router.post('/events/save', auth, eventsController.saveEvent);
 router.get('/events/saved', auth, eventsController.getSavedEvents);
-router.delete('/events/saved/:eventId', auth, eventsController.removeSavedEvent);
+router.delete(
+	'/events/saved/:eventId',
+	auth,
+	eventsController.removeSavedEvent
+);
 
-module.exports = router; 
+module.exports = router;
