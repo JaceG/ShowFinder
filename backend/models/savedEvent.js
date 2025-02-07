@@ -23,6 +23,6 @@ const savedEventSchema = new mongoose.Schema({
 // Compound index to ensure a user can't save the same event twice
 savedEventSchema.index({ userId: 1, eventId: 1 }, { unique: true });
 
-const SavedEvent = mongoose.model('SavedEvent', savedEventSchema);
+const savedEvent = mongoose.model('savedEvent', savedEventSchema);
 
-module.exports = SavedEvent;
+module.exports = savedEvent;
