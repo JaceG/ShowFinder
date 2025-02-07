@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { searchEvents } from './api/ticketmasterApi';
+import { searchEvents, saveEvent, getSavedEvents, unsaveEvent } from './api/ticketmasterApi';
 import EventDetails from './components/EventDetails';
 import Navigation from './components/Navigation';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
+import SavedEvents from './components/SavedEvents';
 import {
 	Container,
 	TextField,
@@ -31,7 +32,10 @@ import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useTheme } from './context/ThemeContext';
+import EventCard from './components/EventCard';
 
 function EventsPage() {
 	const [city, setCity] = useState('');
@@ -42,7 +46,23 @@ function EventsPage() {
 	const [genreFilter, setGenreFilter] = useState('all');
 	const [expanded, setExpanded] = useState({});
 	const [selectedEvent, setSelectedEvent] = useState(null);
+	const [savedEventIds, setSavedEventIds] = useState(new Set());
 	const { mode, toggleColorMode } = useTheme();
+
+	useEffect(() => {
+		const loadSavedEvents = async () => {
+			try {
+				const { savedEvents } = await getSavedEvents();
+				setSavedEventIds(new Set(savedEvents.map(event => event.eventId)));
+			} catch (error) {
+				console.error('Error loading saved events:', error);
+			}
+		};
+
+		if (localStorage.getItem('token')) {
+			loadSavedEvents();
+		}
+	}, []);
 
 	const handleExpandClick = (eventId) => {
 		setExpanded({
@@ -65,6 +85,34 @@ function EventsPage() {
 			setError(err.response?.data?.error || 'Failed to fetch events');
 		} finally {
 			setLoading(false);
+		}
+	};
+
+	const handleSaveToggle = async (event) => {
+		if (!localStorage.getItem('token')) {
+			alert('Please log in to save events');
+			return;
+		}
+		
+		try {
+			console.log('Toggling save for event:', event); // Debug log
+			if (savedEventIds.has(event.id)) {
+				console.log('Unsaving event:', event.id); // Debug log
+				await unsaveEvent(event.id);
+				setSavedEventIds(prev => {
+					const newSet = new Set(prev);
+					newSet.delete(event.id);
+					return newSet;
+				});
+			} else {
+				console.log('Saving event:', event); // Debug log
+				const response = await saveEvent(event);
+				console.log('Save response:', response); // Debug log
+				setSavedEventIds(prev => new Set([...prev, event.id]));
+			}
+		} catch (error) {
+			console.error('Failed to toggle event save:', error);
+			alert(error.message || 'Failed to save/unsave event');
 		}
 	};
 
@@ -215,174 +263,14 @@ function EventsPage() {
 				<Grid container spacing={3}>
 					{filteredEvents.map((event) => (
 						<Grid item xs={12} sm={6} md={4} key={event.id}>
-							<Card
-								sx={{
-									height: '100%',
-									display: 'flex',
-									flexDirection: 'column',
-								}}>
-								<CardMedia
-									component='img'
-									height='200'
-									image={
-										event.images?.[0]?.url ||
-										'https://via.placeholder.com/400x200?text=No+Image'
-									}
-									alt={event.name}
-								/>
-								<CardContent sx={{ flexGrow: 1 }}>
-									<Typography
-										gutterBottom
-										variant='h5'
-										component='h2'>
-										{event.name}
-									</Typography>
-									<Box
-										sx={{
-											display: 'flex',
-											alignItems: 'center',
-											mb: 1,
-										}}>
-										<CalendarTodayIcon
-											sx={{ mr: 1, fontSize: 'small' }}
-										/>
-										<Typography
-											variant='body2'
-											color='text.secondary'>
-											{new Date(
-												event.dates.start.localDate
-											).toLocaleDateString()}{' '}
-											at{' '}
-											{event.dates.start.localTime ||
-												'TBA'}
-										</Typography>
-									</Box>
-									<Box
-										sx={{
-											display: 'flex',
-											alignItems: 'center',
-											mb: 1,
-										}}>
-										<LocationOnIcon
-											sx={{ mr: 1, fontSize: 'small' }}
-										/>
-										<Typography
-											variant='body2'
-											color='text.secondary'>
-											{event._embedded?.venues?.[0]?.name}
-											,{' '}
-											{
-												event._embedded?.venues?.[0]
-													?.city?.name
-											}
-										</Typography>
-									</Box>
-									<Box sx={{ mt: 2, mb: 1 }}>
-										{event.classifications?.[0]?.genre && (
-											<Chip
-												label={
-													event.classifications[0]
-														.genre.name
-												}
-												size='small'
-												sx={{ mr: 0.5, mb: 0.5 }}
-											/>
-										)}
-										{event.family && (
-											<Chip
-												icon={<FamilyRestroomIcon />}
-												label='Family Friendly'
-												size='small'
-												sx={{ mr: 0.5, mb: 0.5 }}
-											/>
-										)}
-									</Box>
-									{event.priceRanges && (
-										<Box
-											sx={{
-												display: 'flex',
-												alignItems: 'center',
-												mb: 1,
-											}}>
-											<LocalOfferIcon
-												sx={{
-													mr: 1,
-													fontSize: 'small',
-												}}
-											/>
-											<Typography
-												variant='body2'
-												color='text.secondary'>
-												${event.priceRanges[0].min} - $
-												{event.priceRanges[0].max}
-											</Typography>
-										</Box>
-									)}
-								</CardContent>
-								<CardActions>
-									<Button
-										href={event.url}
-										target='_blank'
-										rel='noopener noreferrer'
-										variant='contained'
-										size='small'>
-										Get Tickets
-									</Button>
-									<Button
-										onClick={() => setSelectedEvent(event)}
-										variant='outlined'
-										size='small'>
-										More Details
-									</Button>
-									<IconButton
-										onClick={() =>
-											handleExpandClick(event.id)
-										}
-										aria-expanded={expanded[event.id]}
-										aria-label='show more'>
-										<ExpandMoreIcon />
-									</IconButton>
-								</CardActions>
-								<Collapse
-									in={expanded[event.id]}
-									timeout='auto'
-									unmountOnExit>
-									<CardContent>
-										{event.pleaseNote && (
-											<Typography paragraph>
-												<strong>Note:</strong>{' '}
-												{event.pleaseNote}
-											</Typography>
-										)}
-										{event._embedded?.venues?.[0]
-											?.generalInfo && (
-											<Typography paragraph>
-												<strong>Venue Info:</strong>{' '}
-												{
-													event._embedded.venues[0]
-														.generalInfo.generalRule
-												}
-											</Typography>
-										)}
-										{event._embedded?.venues?.[0]
-											?.parkingDetail && (
-											<Typography paragraph>
-												<strong>Parking:</strong>{' '}
-												{
-													event._embedded.venues[0]
-														.parkingDetail
-												}
-											</Typography>
-										)}
-										{event.accessibility && (
-											<Typography paragraph>
-												<strong>Accessibility:</strong>{' '}
-												{event.accessibility.info}
-											</Typography>
-										)}
-									</CardContent>
-								</Collapse>
-							</Card>
+							<EventCard 
+								event={event}
+								saved={savedEventIds.has(event.id)}
+								onSaveToggle={handleSaveToggle}
+								onExpandClick={handleExpandClick}
+								expanded={expanded[event.id]}
+								onMoreDetails={setSelectedEvent}
+							/>
 						</Grid>
 					))}
 				</Grid>
@@ -403,6 +291,7 @@ function App() {
 				<Route path="/" element={<EventsPage />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<SignUp />} />
+				<Route path="/saved-events" element={<SavedEvents />} />
 			</Routes>
 		</Router>
 	);
