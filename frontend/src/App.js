@@ -108,11 +108,7 @@ function EventsPage() {
 					onClick={toggleColorMode}
 					color='inherit'
 					sx={{ position: 'absolute', top: 16, right: 16 }}>
-					{mode === 'dark' ? (
-						<Brightness7Icon />
-					) : (
-						<Brightness4Icon />
-					)}
+					<Brightness4Icon style={{ fill: '#000' }} />
 				</IconButton>
 				<Box
 					sx={{
