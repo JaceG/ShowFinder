@@ -12,25 +12,19 @@ const Navigation = () => {
         navigate('/');
     };
 
-    // This function only clears user authentication info,
-    // preserving saved events if they are stored under a different key.
-    const handleBrandClick = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        // If saved events are stored under a key like 'savedEvents',
-        // they will remain untouched.
-        window.location.href = '/';
-    };
-
     return (
         <nav className="navigation">
-            <div 
+            <Link 
+                to="/" 
                 className="nav-brand" 
-                onClick={handleBrandClick} 
-                style={{ cursor: 'pointer' }}
+                style={{ 
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    color: 'inherit'
+                }}
             >
                 Event App
-            </div>
+            </Link>
             <div className="nav-links">
                 {user ? (
                     <>
