@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTheme } from '@mui/material/styles'; // import useTheme from MUI
 import './Navigation.css';
 
 const Navigation = () => {
