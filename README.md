@@ -1,5 +1,7 @@
 # ShowFinder - Local Concert Search Tool
 
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
+
 A web application that helps users discover local music events and concerts in their area.
 
 ## Project Overview
@@ -60,18 +62,31 @@ ShowFinder/
 Create a `.env` file in the backend directory:
 
 ```env
-PORT=5000
+PORT=3333
 NODE_ENV=development
 MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
 
 # API Keys
-TICKETMASTER_API_KEY=your_key
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
-GOOGLE_API_KEY=your_key
-OPENWEATHER_API_KEY=your_key
-JWT_SECRET=your_jwt_secret
+PORT=3000
+REACT_APP_GOOGLE_API_KEY=your_google_key
+TICKETMASTER_API_KEY=your_ticketmaster_key
+SPOTIFY_CLIENT_ID=your_spotify_client_id
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+GOOGLE_API_KEY=your_google_key
+OPENWEATHER_API_KEY=your_openweather_key
 ```
+
+The backend server will run on `http://localhost:3333` and the frontend development server on `http://localhost:3000`.
+
+### Required API Keys:
+
+- **Ticketmaster API**: Get your key at [Ticketmaster Developer Portal](https://developer.ticketmaster.com/)
+- **Spotify API**: Get your client ID and secret at [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
+- **Google Maps & YouTube**: Get your API key at [Google Cloud Console](https://console.cloud.google.com/)
+  - Enable both Maps JavaScript API and YouTube Data API v3
+- **OpenWeather API**: Get your key at [OpenWeather](https://openweathermap.org/api)
+
 
 ### Installation
 
@@ -152,8 +167,8 @@ Credits: This project was created as part of a coding bootcamp group project. - 
 
 ## Preview
 
-![Main Page](/assets/img/homepage.png)
+![Main Page](/assets/homepage.png)
 
-![Login Page](/assets/img/loginpage.png)
+![Login Page](/assets/loginpage.png)
 
-![Register Page](/assets/img/regpage.png)
+![Register Page](/assets/regpage.png)

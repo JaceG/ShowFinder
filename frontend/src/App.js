@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { searchEvents, saveEvent, getSavedEvents, unsaveEvent } from './api/ticketmasterApi';
+import {
+	searchEvents,
+	saveEvent,
+	getSavedEvents,
+	unsaveEvent,
+} from './api/ticketmasterApi';
 import EventDetails from './components/EventDetails';
 import Navigation from './components/Navigation';
 import Login from './components/Login';
@@ -10,9 +15,6 @@ import {
 	Container,
 	TextField,
 	Button,
-	Card,
-	CardContent,
-	CardMedia,
 	Typography,
 	Grid,
 	FormControl,
@@ -20,20 +22,9 @@ import {
 	Select,
 	MenuItem,
 	Box,
-	Chip,
-	CardActions,
-	Collapse,
 	IconButton,
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useTheme } from './context/ThemeContext';
 import EventCard from './components/EventCard';
 
@@ -53,7 +44,9 @@ function EventsPage() {
 		const loadSavedEvents = async () => {
 			try {
 				const { savedEvents } = await getSavedEvents();
-				setSavedEventIds(new Set(savedEvents.map(event => event.eventId)));
+				setSavedEventIds(
+					new Set(savedEvents.map((event) => event.eventId))
+				);
 			} catch (error) {
 				console.error('Error loading saved events:', error);
 			}
@@ -93,13 +86,13 @@ function EventsPage() {
 			alert('Please log in to save events');
 			return;
 		}
-		
+
 		try {
 			console.log('Toggling save for event:', event); // Debug log
 			if (savedEventIds.has(event.id)) {
 				console.log('Unsaving event:', event.id); // Debug log
 				await unsaveEvent(event.id);
-				setSavedEventIds(prev => {
+				setSavedEventIds((prev) => {
 					const newSet = new Set(prev);
 					newSet.delete(event.id);
 					return newSet;
@@ -108,7 +101,7 @@ function EventsPage() {
 				console.log('Saving event:', event); // Debug log
 				const response = await saveEvent(event);
 				console.log('Save response:', response); // Debug log
-				setSavedEventIds(prev => new Set([...prev, event.id]));
+				setSavedEventIds((prev) => new Set([...prev, event.id]));
 			}
 		} catch (error) {
 			console.error('Failed to toggle event save:', error);
@@ -163,7 +156,7 @@ function EventsPage() {
 						alignItems: 'center',
 						justifyContent: 'center',
 						width: 48,
-					  }}>
+					}}>
 					<Brightness4Icon style={{ fill: '#000' }} />
 				</IconButton>
 				<Box
@@ -263,7 +256,7 @@ function EventsPage() {
 				<Grid container spacing={3}>
 					{filteredEvents.map((event) => (
 						<Grid item xs={12} sm={6} md={4} key={event.id}>
-							<EventCard 
+							<EventCard
 								event={event}
 								saved={savedEventIds.has(event.id)}
 								onSaveToggle={handleSaveToggle}
@@ -288,10 +281,10 @@ function App() {
 		<Router>
 			<Navigation />
 			<Routes>
-				<Route path="/" element={<EventsPage />} />
-				<Route path="/login" element={<Login />} />
-				<Route path="/signup" element={<SignUp />} />
-				<Route path="/saved-events" element={<SavedEvents />} />
+				<Route path='/' element={<EventsPage />} />
+				<Route path='/login' element={<Login />} />
+				<Route path='/signup' element={<SignUp />} />
+				<Route path='/saved-events' element={<SavedEvents />} />
 			</Routes>
 		</Router>
 	);
