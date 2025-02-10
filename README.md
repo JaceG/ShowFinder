@@ -1,5 +1,6 @@
 # ShowFinder - Local Concert Search Tool
 
+
 A web application that helps users discover local music events and concerts in their area.
 
 ## Project Overview
