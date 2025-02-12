@@ -16,10 +16,10 @@ const app = express();
 app.use((req, res, next) => {
 	res.setHeader(
 		'Content-Security-Policy',
-		"default-src 'self'; " +
+		"font-src 'self' https://fonts.gstatic.com; " +
 			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
 			"style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-			"font-src 'self' data: https://fonts.gstatic.com; " +
+			"default-src 'self'; " +
 			"script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
 			"img-src 'self' data: https: blob:; " +
 			"connect-src 'self' https://app.ticketmaster.com https://*.googleapis.com https://api.openweathermap.org"
