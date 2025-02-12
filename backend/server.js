@@ -17,12 +17,12 @@ app.use((req, res, next) => {
 	res.setHeader(
 		'Content-Security-Policy',
 		"default-src 'self'; " +
-			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-			"font-src 'self' https://fonts.gstatic.com; " +
-			"img-src 'self' data: https:; " +
+			"style-src 'self' 'unsafe-inline'; " +
+			"font-src 'self'; " + // Only allow local fonts
+			"img-src 'self' data: https: blob:; " +
 			"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com; " +
 			"frame-src 'self' https://www.youtube.com; " +
-			"connect-src 'self' https://app.ticketmaster.com https://*.googleapis.com https://openweathermap.org;"
+			"connect-src 'self' https://app.ticketmaster.com https://*.googleapis.com https://api.openweathermap.org"
 	);
 	next();
 });

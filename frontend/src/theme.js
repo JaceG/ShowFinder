@@ -2,6 +2,18 @@ import { createTheme } from '@mui/material';
 
 export const getTheme = (mode) =>
 	createTheme({
+		typography: {
+			fontFamily: [
+				'Mulish',
+				'-apple-system',
+				'BlinkMacSystemFont',
+				'"Segoe UI"',
+				'Roboto',
+				'"Helvetica Neue"',
+				'Arial',
+				'sans-serif',
+			].join(','),
+		},
 		palette: {
 			mode,
 			primary: {
@@ -42,6 +54,31 @@ export const getTheme = (mode) =>
 				  }),
 		},
 		components: {
+			MuiCssBaseline: {
+				styleOverrides: `
+					@font-face {
+						font-family: 'Mulish';
+						font-style: normal;
+						font-display: swap;
+						font-weight: 400;
+						src: local('Mulish'), local('Mulish-Regular'), url('/fonts/Mulish-Regular.woff2') format('woff2');
+					}
+					@font-face {
+						font-family: 'Mulish';
+						font-style: normal;
+						font-display: swap;
+						font-weight: 700;
+						src: local('Mulish'), local('Mulish-Bold'), url('/fonts/Mulish-Bold.woff2') format('woff2');
+					}
+					@font-face {
+						font-family: 'Mulish';
+						font-style: normal;
+						font-display: swap;
+						font-weight: 300;
+						src: local('Mulish'), local('Mulish-Light'), url('/fonts/Mulish-Light.woff2') format('woff2');
+					}
+				`,
+			},
 			MuiCard: {
 				styleOverrides: {
 					root: ({ theme }) => ({
