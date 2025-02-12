@@ -14,6 +14,7 @@ const app = express();
 
 // Enhanced error logging middleware
 app.use((req, res, next) => {
+	console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
 	const oldSend = res.send;
 	res.send = function (data) {
 		console.log(
@@ -24,10 +25,29 @@ app.use((req, res, next) => {
 	next();
 });
 
-// Request logging
-app.use((req, res, next) => {
-	console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-	next();
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// API routes
+app.use('/api/weather', weatherRoutes);
+app.use('/api/spotify', spotifyRoutes);
+app.use('/api/google', googleRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/users', userRoutes);
+
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+	console.log('Catch-all route hit for:', req.url);
+	res.sendFile(
+		path.join(__dirname, '../frontend/build/index.html'),
+		(err) => {
+			if (err) {
+				console.error('Error sending file:', err);
+				res.status(500).send(err);
+			}
+		}
+	);
 });
 
 // Global error handler
@@ -65,28 +85,10 @@ app.use((req, res, next) => {
 	next();
 });
 
-// API Routes
-app.use('/api/weather', weatherRoutes);
-app.use('/api/google', googleRoutes);
-app.use('/api/spotify', spotifyRoutes);
-app.use('/api/events', eventRoutes);
-app.use('/api/users', userRoutes);
-
 // Handle 404s for API routes
 app.use('/api/*', (req, res) => {
 	res.status(404).json({ error: 'API endpoint not found' });
 });
-
-// Serve static files in production
-if (config.nodeEnv === 'production') {
-	app.use(express.static(path.join(__dirname, '../frontend/build')));
-	app.get('*', (req, res) => {
-		res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
-	});
-}
-
-// Error Handler (single handler)
-app.use(errorHandler);
 
 const PORT = config.port || 3333;
 
