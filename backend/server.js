@@ -12,6 +12,29 @@ const userRoutes = require('./routes/users');
 
 const app = express();
 
+// Body parser middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// CORS configuration
+app.use(
+	cors({
+		origin: [
+			'https://showfinder-mnz5.onrender.com',
+			'http://localhost:3000',
+		],
+		credentials: true,
+		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+		allowedHeaders: ['Content-Type', 'Authorization'],
+	})
+);
+
+// Request logging
+app.use((req, res, next) => {
+	console.log(`${req.method} ${req.path}`);
+	next();
+});
+
 // Enhanced error logging middleware
 app.use((req, res, next) => {
 	console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
@@ -25,9 +48,6 @@ app.use((req, res, next) => {
 	next();
 });
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../frontend/build')));
-
 // API routes
 app.use('/api/weather', weatherRoutes);
 app.use('/api/spotify', spotifyRoutes);
@@ -35,8 +55,15 @@ app.use('/api/google', googleRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
 
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
+// Handle 404s for API routes
+app.use('/api/*', (req, res) => {
+	res.status(404).json({ error: 'API endpoint not found' });
+});
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// The catchall handler
 app.get('*', (req, res) => {
 	console.log('Catch-all route hit for:', req.url);
 	res.sendFile(
@@ -73,21 +100,6 @@ process.on('unhandledRejection', (reason, promise) => {
 // Catch uncaught exceptions
 process.on('uncaughtException', (error) => {
 	console.error('Uncaught Exception:', error);
-});
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Add request logging
-app.use((req, res, next) => {
-	console.log(`${req.method} ${req.path}`);
-	next();
-});
-
-// Handle 404s for API routes
-app.use('/api/*', (req, res) => {
-	res.status(404).json({ error: 'API endpoint not found' });
 });
 
 const PORT = config.port || 3333;
