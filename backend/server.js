@@ -18,7 +18,8 @@ app.use((req, res, next) => {
 		'Content-Security-Policy',
 		"default-src 'self'; " +
 			"style-src 'self' 'unsafe-inline'; " +
-			"font-src 'self'; " +
+			"style-src-elem 'self' 'unsafe-inline'; " +
+			"font-src 'self' data:; " +
 			"img-src 'self' data: https: blob:; " +
 			"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com; " +
 			"frame-src 'self' https://www.youtube.com; " +

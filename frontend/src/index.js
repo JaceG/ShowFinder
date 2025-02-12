@@ -11,7 +11,7 @@ root.render(
 	<React.StrictMode>
 		<StyledEngineProvider injectFirst>
 			<ThemeProvider>
-				<CssBaseline enableColorScheme />
+				<CssBaseline enableColorScheme disableGoogleFonts />
 				<App />
 			</ThemeProvider>
 		</StyledEngineProvider>
