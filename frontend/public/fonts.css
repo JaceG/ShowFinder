@@ -1,0 +1,45 @@
+/* Mulish */
+@font-face {
+    font-family: 'Mulish';
+    src: url('./fonts/Mulish-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Mulish';
+    src: url('./fonts/Mulish-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Mulish';
+    src: url('./fonts/Mulish-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+}
+
+/* Roboto Mono */
+@font-face {
+    font-family: 'Roboto Mono';
+    src: url('./fonts/RobotoMono-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* Roboto Serif */
+@font-face {
+    font-family: 'Roboto Serif';
+    src: url('./fonts/RobotoSerif-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+
+/* Work Sans */
+@font-face {
+    font-family: 'Work Sans';
+    src: url('./fonts/WorkSans-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+} 
