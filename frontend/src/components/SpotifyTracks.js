@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	Card,
 	CardContent,
@@ -7,7 +7,6 @@ import {
 	CircularProgress,
 	Alert,
 	IconButton,
-	Link,
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -19,12 +18,11 @@ const API_URL =
 		? '/api'
 		: 'http://localhost:3333/api';
 
-function SpotifyTracks({ artistName }) {
+const SpotifyTracks = ({ artistName }) => {
 	const [tracks, setTracks] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [playing, setPlaying] = useState(null);
-	const [audio, setAudio] = useState(null);
 
 	useEffect(() => {
 		const fetchTracks = async () => {
@@ -40,119 +38,129 @@ function SpotifyTracks({ artistName }) {
 				}
 
 				const data = await response.json();
-				setTracks(data.tracks || []);
-			} catch (err) {
-				console.error('Error fetching tracks:', err);
-				setError('Failed to load tracks');
+				const tracksList = data.tracks?.items || [];
+				setTracks(tracksList);
+			} catch (error) {
+				console.error('Error fetching tracks:', error);
+				setError(error.message);
 			} finally {
 				setLoading(false);
 			}
 		};
 
-		fetchTracks();
+		if (artistName) {
+			fetchTracks();
+		}
+	}, [artistName]);
 
-		// Cleanup audio on unmount
-		return () => {
-			if (audio) {
-				audio.pause();
-				audio.src = '';
-			}
-		};
-	}, [artistName, audio]);
-
-	const handlePlay = (track) => {
-		if (!track.previewUrl) return;
-
-		if (playing === track.id) {
+	const handlePlay = (trackId, previewUrl) => {
+		if (playing === trackId) {
+			// Stop playing
+			const audio = document.getElementById(`audio-${trackId}`);
 			audio.pause();
 			setPlaying(null);
 		} else {
-			if (audio) {
-				audio.pause();
+			// Stop any currently playing audio
+			if (playing) {
+				const currentAudio = document.getElementById(
+					`audio-${playing}`
+				);
+				currentAudio.pause();
 			}
-			const newAudio = new Audio(track.previewUrl);
-			newAudio.play();
-			newAudio.onended = () => setPlaying(null);
-			setAudio(newAudio);
-			setPlaying(track.id);
+			// Start playing new track
+			const audio = document.getElementById(`audio-${trackId}`);
+			audio.play();
+			setPlaying(trackId);
 		}
 	};
 
 	if (loading) return <CircularProgress />;
 	if (error) return <Alert severity='error'>{error}</Alert>;
-	if (tracks.length === 0)
-		return <Alert severity='info'>No tracks found</Alert>;
+	if (!tracks || tracks.length === 0)
+		return (
+			<Box display='flex' alignItems='center' gap={1}>
+				<MusicNoteIcon />
+				<Typography>No tracks found</Typography>
+			</Box>
+		);
 
 	return (
-		<Card sx={{ mb: 2 }}>
-			<CardContent>
-				<Typography
-					variant='h6'
-					gutterBottom
-					sx={{ display: 'flex', alignItems: 'center' }}>
-					<MusicNoteIcon sx={{ mr: 1 }} />
-					Top Tracks
-				</Typography>
-
-				{tracks.map((track) => (
-					<Box
-						key={track.id}
-						sx={{
-							display: 'flex',
-							alignItems: 'center',
-							mb: 2,
-							p: 1,
-							borderRadius: 1,
-							'&:hover': { bgcolor: 'action.hover' },
-						}}>
-						<Box
-							component='img'
-							src={track.albumArt}
-							alt={track.name}
-							sx={{
-								width: 50,
-								height: 50,
-								mr: 2,
-								borderRadius: 1,
-							}}
-						/>
-
-						<Box sx={{ flexGrow: 1 }}>
-							<Typography variant='body1'>
-								{track.name}
-							</Typography>
-						</Box>
-
-						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							{track.previewUrl && (
-								<IconButton
-									onClick={() => handlePlay(track)}
-									color={
-										playing === track.id
-											? 'primary'
-											: 'default'
-									}>
-									{playing === track.id ? (
-										<PauseIcon />
-									) : (
-										<PlayArrowIcon />
-									)}
-								</IconButton>
+		<Box sx={{ mb: 4 }}>
+			<Typography
+				variant='h6'
+				gutterBottom
+				sx={{ display: 'flex', alignItems: 'center' }}>
+				<MusicNoteIcon sx={{ mr: 1 }} />
+				Top Tracks
+			</Typography>
+			{tracks.map((track) => (
+				<Card key={track.id} sx={{ mb: 2 }}>
+					<CardContent>
+						<Box display='flex' alignItems='center' gap={2}>
+							{track.album?.images?.[0] && (
+								<Box
+									component='img'
+									src={track.album.images[0].url}
+									sx={{
+										width: 60,
+										height: 60,
+										borderRadius: 1,
+									}}
+									alt={track.album.name}
+								/>
 							)}
-
-							<IconButton
-								component={Link}
-								href={track.spotifyUrl}
-								target='_blank'
-								rel='noopener noreferrer'>
-								<OpenInNewIcon />
-							</IconButton>
+							<Box flex={1}>
+								<Typography variant='subtitle1'>
+									{track.name}
+								</Typography>
+								<Typography
+									variant='body2'
+									color='textSecondary'>
+									Album: {track.album?.name}
+								</Typography>
+							</Box>
+							<Box display='flex' alignItems='center' gap={1}>
+								{track.preview_url && (
+									<>
+										<IconButton
+											onClick={() =>
+												handlePlay(
+													track.id,
+													track.preview_url
+												)
+											}
+											size='small'
+											sx={{ color: 'primary.main' }}>
+											{playing === track.id ? (
+												<PauseIcon />
+											) : (
+												<PlayArrowIcon />
+											)}
+										</IconButton>
+										<audio
+											id={`audio-${track.id}`}
+											src={track.preview_url}
+											onEnded={() => setPlaying(null)}
+										/>
+									</>
+								)}
+								{track.external_urls?.spotify && (
+									<IconButton
+										size='small'
+										href={track.external_urls.spotify}
+										target='_blank'
+										rel='noopener noreferrer'
+										sx={{ color: 'primary.main' }}>
+										<OpenInNewIcon />
+									</IconButton>
+								)}
+							</Box>
 						</Box>
-					</Box>
-				))}
-			</CardContent>
-		</Card>
+					</CardContent>
+				</Card>
+			))}
+		</Box>
 	);
-}
+};
 
 export default SpotifyTracks;

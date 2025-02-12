@@ -10,16 +10,33 @@ import {
 } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import DirectionsIcon from '@mui/icons-material/Directions';
+import { API_URL } from '../api';
 
 function VenueMap({ venue }) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [mapLoaded, setMapLoaded] = useState(false);
+	const [apiKey, setApiKey] = useState(null);
 	const mapContainerRef = useRef(null);
 	const scriptRef = useRef(null);
 	const mapRef = useRef(null);
 
-	const MAPS_API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
+	// Fetch API key
+	useEffect(() => {
+		const fetchApiKey = async () => {
+			try {
+				const response = await fetch(`${API_URL}/google/maps/key`);
+				if (!response.ok) throw new Error('Failed to fetch API key');
+				const data = await response.json();
+				setApiKey(data.key);
+			} catch (err) {
+				console.error('Error fetching API key:', err);
+				setError('Failed to load map configuration');
+				setLoading(false);
+			}
+		};
+		fetchApiKey();
+	}, []);
 
 	const initMap = useCallback(() => {
 		if (!venue?.location?.latitude || !venue?.location?.longitude) {
@@ -44,7 +61,6 @@ function VenueMap({ venue }) {
 					lng: parseFloat(venue.location.longitude),
 				};
 
-				// Create the map instance - use window.google instead of google
 				mapRef.current = new window.google.maps.Map(
 					mapContainerRef.current,
 					{
@@ -56,7 +72,6 @@ function VenueMap({ venue }) {
 					}
 				);
 
-				// Add marker - use window.google instead of google
 				new window.google.maps.Marker({
 					position: location,
 					map: mapRef.current,
@@ -75,9 +90,16 @@ function VenueMap({ venue }) {
 		tryInitMap();
 	}, [venue]);
 
-	// Load Google Maps Script
 	useEffect(() => {
-		if (!MAPS_API_KEY) return;
+		if (!apiKey) return;
+
+		console.log('VenueMap mounted with venue:', venue);
+
+		if (!venue?.location?.latitude || !venue?.location?.longitude) {
+			setError('Venue location not available');
+			setLoading(false);
+			return;
+		}
 
 		const loadGoogleMaps = () => {
 			if (!window.google && !scriptRef.current) {
@@ -87,7 +109,7 @@ function VenueMap({ venue }) {
 				};
 
 				const script = document.createElement('script');
-				script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&callback=initMap`;
+				script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
 				script.async = true;
 				script.defer = true;
 				script.onerror = (e) => {
@@ -95,6 +117,7 @@ function VenueMap({ venue }) {
 					setError('Failed to load Google Maps');
 					setLoading(false);
 				};
+
 				document.head.appendChild(script);
 				scriptRef.current = script;
 			} else if (window.google && !mapLoaded) {
@@ -113,25 +136,7 @@ function VenueMap({ venue }) {
 				window.initMap = undefined;
 			}
 		};
-	}, [MAPS_API_KEY, initMap, mapLoaded]);
-
-	// Hide error messages
-	useEffect(() => {
-		const style = document.createElement('style');
-		style.textContent = `
-			.gm-err-container,
-			.gm-err-content,
-			.gm-err-message,
-			.gm-err-title {
-				display: none !important;
-			}
-		`;
-		document.head.appendChild(style);
-
-		return () => {
-			document.head.removeChild(style);
-		};
-	}, []);
+	}, [apiKey, initMap, mapLoaded, venue]);
 
 	const getDirectionsUrl = () => {
 		if (!venue?.location?.latitude || !venue?.location?.longitude)
@@ -145,7 +150,7 @@ function VenueMap({ venue }) {
 				<CardContent>
 					<Alert severity='error'>
 						{error}
-						{!MAPS_API_KEY && ' (API key missing)'}
+						{!apiKey && ' (API key missing)'}
 					</Alert>
 				</CardContent>
 			</Card>
@@ -162,7 +167,6 @@ function VenueMap({ venue }) {
 					<LocationOnIcon sx={{ mr: 1 }} />
 					Venue Location
 				</Typography>
-
 				<Box
 					ref={mapContainerRef}
 					sx={{
@@ -174,20 +178,17 @@ function VenueMap({ venue }) {
 						bgcolor: 'grey.100',
 					}}
 				/>
-
 				{loading && !mapLoaded && (
 					<Box display='flex' justifyContent='center' my={2}>
 						<CircularProgress />
 					</Box>
 				)}
-
 				<Typography variant='body1' gutterBottom>
 					{venue.name}
 					{venue.address && `, ${venue.address.line1}`}
 					{venue.city && `, ${venue.city.name}`}
 					{venue.state && `, ${venue.state.stateCode}`}
 				</Typography>
-
 				<Button
 					variant='contained'
 					color='primary'

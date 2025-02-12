@@ -1,80 +1,74 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
-const mongoose = require('mongoose');
-const eventsRouter = require('./routes/events');
 const path = require('path');
-const googleRouter = require('./routes/google');
-const weatherRouter = require('./routes/weather');
-const spotifyRouter = require('./routes/spotify');
-const userRouter = require('./routes/users');
+const connectDB = require('./config/db');
+const config = require('./config/config');
+const errorHandler = require('./middleware/errorHandler');
+const weatherRoutes = require('./routes/weather');
+const spotifyRoutes = require('./routes/spotify');
+const googleRoutes = require('./routes/google');
+const eventRoutes = require('./routes/events');
+const userRoutes = require('./routes/users');
 
 const app = express();
-const PORT = process.env.PORT || 3333;
 
-// Add CSP headers middleware before other middleware
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Add request logging
 app.use((req, res, next) => {
-	res.setHeader(
-		'Content-Security-Policy',
-		"default-src 'self'; " +
-			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-			"font-src 'self' https://fonts.gstatic.com; " +
-			"img-src 'self' data: https:; " +
-			"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com; " +
-			"frame-src 'self' https://www.youtube.com; " +
-			"connect-src 'self' https://app.ticketmaster.com https://*.googleapis.com https://openweathermap.org;"
-	);
+	console.log(`${req.method} ${req.path}`);
 	next();
 });
 
-// CORS middleware
-app.use(
-	cors({
-		origin:
-			process.env.NODE_ENV === 'production'
-				? true // Allow all origins in production
-				: 'http://localhost:3000',
-		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-		allowedHeaders: ['Content-Type', 'Authorization'],
-		credentials: true,
-	})
-);
+// API Routes
+app.use('/api/weather', weatherRoutes);
+app.use('/api/google', googleRoutes);
+app.use('/api/spotify', spotifyRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/users', userRoutes);
 
-// Parse JSON bodies
-app.use(express.json());
-
-// Serve static files from the React frontend app
-app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-// Update MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eventapp')
-	.then(() => console.log('Connected to MongoDB'))
-	.catch(err => console.error('MongoDB connection error:', err));
-
-// Basic health check route
-app.get('/api/health', (req, res) => {
-	res.json({ status: 'OK' });
+// Handle 404s for API routes
+app.use('/api/*', (req, res) => {
+	res.status(404).json({ error: 'API endpoint not found' });
 });
 
-// Events routes
-app.use('/api/events', eventsRouter);
-app.use('/api/google', googleRouter);
-app.use('/api/weather', weatherRouter);
-app.use('/api/spotify', spotifyRouter);
-app.use('/api/users', userRouter);
+// Serve static files in production
+if (config.nodeEnv === 'production') {
+	app.use(express.static(path.join(__dirname, '../frontend/build')));
+	app.get('*', (req, res) => {
+		res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+	});
+}
 
-// Handle all other routes by serving the React app
-app.get('*', (req, res) => {
-	res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+// Error Handler (single handler)
+app.use(errorHandler);
+
+const PORT = config.port || 3333;
+
+// Server startup
+const startServer = async () => {
+	try {
+		await connectDB();
+		app.listen(PORT, () => {
+			console.log(`Server running on port ${PORT}`);
+			console.log(`Environment: ${config.nodeEnv}`);
+			console.log('Database connected');
+		});
+	} catch (error) {
+		console.error('Failed to start server:', error);
+		process.exit(1);
+	}
+};
+
+startServer();
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+	console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+	console.log(err.name, err.message);
+	process.exit(1);
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-	console.error(err.stack);
-	res.status(500).json({ error: 'Something broke!' });
-});
-
-// Start server
-app.listen(PORT, () => {
-	console.log(`Server running on port ${PORT}`);
-});
+module.exports = app;

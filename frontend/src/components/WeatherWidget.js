@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	Card,
 	CardContent,
@@ -11,11 +11,7 @@ import {
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import UmbrellaIcon from '@mui/icons-material/BeachAccess';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-
-const API_URL =
-	process.env.NODE_ENV === 'production'
-		? '/api'
-		: 'http://localhost:3333/api';
+import { getWeatherForecast } from '../api/weatherApi';
 
 function WeatherWidget({ venue, eventDate }) {
 	const [weather, setWeather] = useState(null);
@@ -32,37 +28,44 @@ function WeatherWidget({ venue, eventDate }) {
 
 	useEffect(() => {
 		const fetchWeather = async () => {
-			if (!venue?.location?.latitude || !venue?.location?.longitude) {
-				setError('Venue location not available');
-				setLoading(false);
-				return;
-			}
-
 			try {
-				const response = await fetch(
-					`${API_URL}/weather?lat=${venue.location.latitude}&lon=${venue.location.longitude}&date=${eventDate}`
-				);
+				setLoading(true);
+				setError(null);
 
-				if (!response.ok) {
-					throw new Error('Failed to fetch weather data');
+				// Log the input parameters
+				console.log('Fetching weather for:', { venue, eventDate });
+
+				const data = await getWeatherForecast(
+					venue.location.latitude,
+					venue.location.longitude,
+					eventDate
+				);
+				console.log('Weather data received:', data); // Debug log
+
+				if (!data || !data.forecast) {
+					throw new Error('Invalid weather data received');
 				}
 
-				const data = await response.json();
-				setWeather(data.forecasts[0]); // Get the first (closest) forecast
+				setWeather(data);
 			} catch (err) {
-				setError('Could not load weather forecast');
 				console.error('Weather fetch error:', err);
+				setError(err.message);
 			} finally {
 				setLoading(false);
 			}
 		};
 
-		fetchWeather();
+		if (venue.location.latitude && venue.location.longitude) {
+			fetchWeather();
+		}
 	}, [venue, eventDate]);
 
 	if (loading) return <CircularProgress />;
 	if (error) return <Alert severity='info'>{error}</Alert>;
-	if (!weather) return null;
+	if (!weather || !weather.forecast || weather.forecast.length === 0)
+		return null;
+
+	const forecast = weather.forecast[0]; // Get the first forecast entry
 
 	// Calculate days until event
 	const daysUntil = Math.ceil(
@@ -103,8 +106,8 @@ function WeatherWidget({ venue, eventDate }) {
 
 				<Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
 					<img
-						src={`https://openweathermap.org/img/w/${weather.icon}.png`}
-						alt={weather.description}
+						src={`https://openweathermap.org/img/w/${forecast.icon}.png`}
+						alt={forecast.description}
 						style={{
 							marginRight: '8px',
 							width: '50px',
@@ -113,12 +116,12 @@ function WeatherWidget({ venue, eventDate }) {
 					/>
 					<Box>
 						<Typography variant='h4'>
-							{Math.round(weather.temp)}°F
+							{Math.round(forecast.temp)}°F
 						</Typography>
 						<Typography
 							variant='body1'
 							sx={{ textTransform: 'capitalize' }}>
-							{weather.description}
+							{forecast.description}
 						</Typography>
 					</Box>
 				</Box>
@@ -127,14 +130,14 @@ function WeatherWidget({ venue, eventDate }) {
 					variant='body2'
 					color='text.secondary'
 					sx={{ mb: 1 }}>
-					Feels like: {Math.round(weather.feels_like)}°F
+					Feels like: {Math.round(forecast.feels_like)}°F
 				</Typography>
 
-				{weather.precipitation > 0 && (
+				{forecast.precipitation > 0 && (
 					<Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
 						<UmbrellaIcon sx={{ mr: 1, color: 'primary.main' }} />
 						<Typography color='primary'>
-							{Math.round(weather.precipitation)}% chance of rain
+							{Math.round(forecast.precipitation)}% chance of rain
 						</Typography>
 					</Box>
 				)}

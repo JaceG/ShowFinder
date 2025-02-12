@@ -1,19 +1,25 @@
 const jwt = require('jsonwebtoken');
+const config = require('../config/config');
+const AppError = require('../utils/AppError');
 
 const auth = async (req, res, next) => {
-    try {
-        const token = req.header('Authorization')?.replace('Bearer ', '');
-        
-        if (!token) {
-            return res.status(401).json({ error: 'Authentication required' });
-        }
+	try {
+		// Get token from header
+		const token = req.header('Authorization')?.replace('Bearer ', '');
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = { id: decoded.id };
-        next();
-    } catch (error) {
-        res.status(401).json({ error: 'Authentication required' });
-    }
+		if (!token) {
+			throw new AppError('Authentication required', 401);
+		}
+
+		// Verify token
+		const decoded = jwt.verify(token, config.jwtSecret);
+
+		// Add user to request
+		req.user = decoded;
+		next();
+	} catch (error) {
+		next(new AppError('Authentication required', 401));
+	}
 };
 
-module.exports = auth; 
+module.exports = auth;

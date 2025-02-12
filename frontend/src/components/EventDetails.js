@@ -16,11 +16,8 @@ import VenueMap from './VenueMap';
 import SpotifyTracks from './SpotifyTracks';
 import SpotifyArtistInfo from './SpotifyArtistInfo';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-
-const API_URL =
-	process.env.NODE_ENV === 'production'
-		? '/api'
-		: 'http://localhost:3333/api';
+import { searchYouTubeVideos } from '../api/googleApi';
+import { searchSpotifyArtist } from '../api/spotifyApi';
 
 function EventDetails({ event, onBack }) {
 	const [videos, setVideos] = useState([]);
@@ -31,29 +28,9 @@ function EventDetails({ event, onBack }) {
 	useEffect(() => {
 		const fetchVideos = async () => {
 			try {
-				console.log('Fetching videos for:', event.name);
-				const response = await fetch(
-					`${API_URL}/google/youtube?q=${encodeURIComponent(
-						event.name
-					)}`,
-					{
-						headers: {
-							Accept: 'application/json',
-						},
-					}
-				);
-
-				if (!response.ok) {
-					const errorText = await response.text();
-					console.error('API Error Response:', errorText);
-					throw new Error(`API error: ${response.status}`);
-				}
-
-				const data = await response.json();
-				console.log('Video data received:', data);
-				setVideos(data.videos || []);
+				const videos = await searchYouTubeVideos(event.name);
+				setVideos(videos);
 			} catch (err) {
-				console.error('Error details:', err);
 				setError(err.message || 'Failed to load videos');
 			} finally {
 				setLoading(false);
@@ -66,19 +43,9 @@ function EventDetails({ event, onBack }) {
 	useEffect(() => {
 		const fetchSpotifyArtist = async () => {
 			try {
-				const response = await fetch(
-					`${API_URL}/spotify/search?q=${encodeURIComponent(
-						event.name
-					)}`
-				);
-
-				if (!response.ok) {
-					throw new Error('Failed to fetch Spotify artist');
-				}
-
-				const data = await response.json();
-				if (data.artistId) {
-					setSpotifyArtistId(data.artistId);
+				const artistId = await searchSpotifyArtist(event.name);
+				if (artistId) {
+					setSpotifyArtistId(artistId);
 				}
 			} catch (err) {
 				console.error('Error fetching Spotify artist:', err);
