@@ -17,11 +17,13 @@ app.use((req, res, next) => {
 	res.setHeader(
 		'Content-Security-Policy',
 		"default-src 'self'; " +
-			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-			"font-src 'self' https://fonts.gstatic.com; " +
-			"img-src 'self' https: data:; " +
-			"script-src 'self' 'unsafe-inline' https://maps.googleapis.com; " +
-			"connect-src 'self' https://maps.googleapis.com"
+			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.googleapis.com; " +
+			"style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.googleapis.com; " +
+			"font-src 'self' https://fonts.gstatic.com https://*.gstatic.com; " +
+			"img-src 'self' https: data: blob:; " +
+			"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com; " +
+			"connect-src 'self' https://*.googleapis.com https://api.openweathermap.org; " +
+			"frame-src 'self' https://*.google.com"
 	);
 	next();
 });
