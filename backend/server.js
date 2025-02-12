@@ -18,11 +18,8 @@ app.use((req, res, next) => {
 		'Content-Security-Policy',
 		"default-src 'self'; " +
 			"style-src 'self' 'unsafe-inline'; " +
-			"style-src-elem 'self' 'unsafe-inline'; " +
-			"font-src 'self' data:; " +
+			"script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
 			"img-src 'self' data: https: blob:; " +
-			"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com; " +
-			"frame-src 'self' https://www.youtube.com; " +
 			"connect-src 'self' https://app.ticketmaster.com https://*.googleapis.com https://api.openweathermap.org"
 	);
 	next();

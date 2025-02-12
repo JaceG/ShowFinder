@@ -3,7 +3,7 @@ import { createTheme } from '@mui/material';
 export const getTheme = (mode) =>
 	createTheme({
 		typography: {
-			fontFamily: 'system-ui, -apple-system, sans-serif',
+			fontFamily: 'Arial, sans-serif',
 		},
 		palette: {
 			mode,
@@ -67,6 +67,14 @@ export const getTheme = (mode) =>
 							backgroundColor: theme.palette.background.paper,
 						},
 					}),
+				},
+			},
+			MuiCssBaseline: {
+				styleOverrides: {
+					'@font-face': 'none',
+					body: {
+						fontFamily: 'Arial, sans-serif',
+					},
 				},
 			},
 		},
