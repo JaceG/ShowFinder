@@ -25,6 +25,10 @@ const eventSchema = new mongoose.Schema(
 		},
 		imageUrl: String,
 		ticketUrl: String,
+		eventData: {
+			type: Object,
+			required: true,
+		},
 	},
 	{
 		timestamps: true,

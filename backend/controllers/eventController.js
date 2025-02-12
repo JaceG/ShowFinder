@@ -70,8 +70,12 @@ exports.saveEvent = async (req, res, next) => {
 			event = await Event.create(eventData);
 		}
 
-		// Add event to user's saved events if not already there
+		// Add event reference to user's saved events
 		const user = await User.findById(req.user.id);
+		if (!user.savedEvents) {
+			user.savedEvents = [];
+		}
+
 		if (!user.savedEvents.includes(event._id)) {
 			user.savedEvents.push(event._id);
 			await user.save();
