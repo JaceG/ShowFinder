@@ -12,17 +12,7 @@ const userRoutes = require('./routes/users');
 
 const app = express();
 
-// Add CSP headers middleware before other middleware
-app.use((req, res, next) => {
-	res.setHeader(
-		'Content-Security-Policy',
-		"default-src 'self' https://app.ticketmaster.com https://*.googleapis.com https://api.openweathermap.org; " +
-			"script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-			"style-src 'self' 'unsafe-inline'; " +
-			"img-src 'self' data: https: blob:"
-	);
-	next();
-});
+// Remove CSP headers completely for now
 
 // Middleware
 app.use(cors());
