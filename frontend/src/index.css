@@ -1,10 +1,10 @@
 body {
   margin: 0;
-  font-family: 'Mulish', sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: 'Roboto Mono', monospace;
+  font-family: monospace;
 }
