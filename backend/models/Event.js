@@ -23,14 +23,8 @@ const eventSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
-		ticketUrl: String,
 		imageUrl: String,
-		genre: String,
-		price: {
-			min: Number,
-			max: Number,
-			currency: String,
-		},
+		ticketUrl: String,
 	},
 	{
 		timestamps: true,
