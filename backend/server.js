@@ -12,7 +12,48 @@ const userRoutes = require('./routes/users');
 
 const app = express();
 
-// Remove CSP headers completely for now
+// Enhanced error logging middleware
+app.use((req, res, next) => {
+	const oldSend = res.send;
+	res.send = function (data) {
+		console.log(
+			`Response for ${req.method} ${req.url}: Status ${res.statusCode}`
+		);
+		return oldSend.apply(res, arguments);
+	};
+	next();
+});
+
+// Request logging
+app.use((req, res, next) => {
+	console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+	next();
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+	console.error('Global error handler caught:', {
+		error: err.message,
+		stack: err.stack,
+		url: req.url,
+		method: req.method,
+	});
+	res.status(500).json({
+		error: 'Internal Server Error',
+		message: err.message,
+		path: req.url,
+	});
+});
+
+// Catch unhandled rejections
+process.on('unhandledRejection', (reason, promise) => {
+	console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// Catch uncaught exceptions
+process.on('uncaughtException', (error) => {
+	console.error('Uncaught Exception:', error);
+});
 
 // Middleware
 app.use(cors());
@@ -65,12 +106,5 @@ const startServer = async () => {
 };
 
 startServer();
-
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-	console.log('UNHANDLED REJECTION! 💥 Shutting down...');
-	console.log(err.name, err.message);
-	process.exit(1);
-});
 
 module.exports = app;
