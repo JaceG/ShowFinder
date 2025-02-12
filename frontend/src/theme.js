@@ -3,7 +3,8 @@ import { createTheme } from '@mui/material';
 export const getTheme = (mode) =>
 	createTheme({
 		typography: {
-			fontFamily: 'Arial, sans-serif',
+			fontFamily:
+				'-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
 		},
 		palette: {
 			mode,
@@ -71,9 +72,10 @@ export const getTheme = (mode) =>
 			},
 			MuiCssBaseline: {
 				styleOverrides: {
-					'@font-face': 'none',
+					'@font-face': [],
 					body: {
-						fontFamily: 'Arial, sans-serif',
+						fontFamily:
+							'-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
 					},
 				},
 			},
