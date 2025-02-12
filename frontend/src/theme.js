@@ -3,16 +3,7 @@ import { createTheme } from '@mui/material';
 export const getTheme = (mode) =>
 	createTheme({
 		typography: {
-			fontFamily: [
-				'Mulish',
-				'-apple-system',
-				'BlinkMacSystemFont',
-				'"Segoe UI"',
-				'Roboto',
-				'"Helvetica Neue"',
-				'Arial',
-				'sans-serif',
-			].join(','),
+			fontFamily: ['Mulish', 'Arial', 'sans-serif'].join(','),
 		},
 		palette: {
 			mode,
