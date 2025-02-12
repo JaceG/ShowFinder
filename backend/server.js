@@ -16,12 +16,10 @@ const app = express();
 app.use((req, res, next) => {
 	res.setHeader(
 		'Content-Security-Policy',
-		"default-src 'self'; " +
-			"style-src 'self' 'unsafe-inline'; " +
+		"default-src 'self' https://app.ticketmaster.com https://*.googleapis.com https://api.openweathermap.org; " +
 			"script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-			"img-src 'self' data: https: blob:; " +
-			"font-src 'self'; " +
-			"connect-src 'self' https://app.ticketmaster.com https://*.googleapis.com https://api.openweathermap.org"
+			"style-src 'self' 'unsafe-inline'; " +
+			"img-src 'self' data: https: blob:"
 	);
 	next();
 });
