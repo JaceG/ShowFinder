@@ -221,6 +221,10 @@ function EventsPage() {
 									<MenuItem value='rock'>Rock</MenuItem>
 									<MenuItem value='pop'>Pop</MenuItem>
 									<MenuItem value='jazz'>Jazz</MenuItem>
+									<MenuItem value='country'>Country</MenuItem>
+									<MenuItem value='folk'>Folk</MenuItem>
+									<MenuItem value='alternative'>Alternative</MenuItem>
+									<MenuItem value='dance/electronic'>Dance/Electronic</MenuItem>
 									<MenuItem value='classical'>
 										Classical
 									</MenuItem>
