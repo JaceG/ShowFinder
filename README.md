@@ -28,20 +28,30 @@ ShowFinder is a full-stack application that allows users to search for local mus
 
 ```
 ShowFinder/
-├── backend/                # Node.js & Express backend
-│   ├── controllers/        # API call handlers
-│   ├── routes/            # Backend routes
+├── backend/                
+│   ├── controllers/        # API controllers
+│   │   └── eventController.js
+│   ├── middleware/         # Custom middleware
+│   │   ├── auth.js
+│   │   └── errorHandler.js
 │   ├── models/            # Database models
-│   ├── middleware/        # Auth & request middleware
-│   ├── config/           # Environment & API configuration
-│   └── server.js         # Express app entry point
-└── frontend/             # React frontend
+│   │   ├── Event.js
+│   │   └── User.js
+│   ├── routes/            # API routes
+│   │   ├── events.js
+│   │   └── users.js
+│   ├── config/            # Configuration
+│   │   ├── config.js
+│   │   └── db.js
+│   └── utils/             # Utility functions
+│       └── AppError.js
+└── frontend/             
     ├── src/
-    │   ├── components/   # UI components
-    │   ├── context/      # Theme & auth context
-    │   ├── api/          # API integration
-    │   └── utils/        # Helper functions
-    └── public/           # Static files
+    │   ├── components/    # React components
+    │   ├── context/       # Theme context
+    │   ├── api/           # API integration
+    │   └── theme.js       # Theme configuration
+    └── public/            # Static files
 ```
 
 ## Getting Started
@@ -59,25 +69,22 @@ ShowFinder/
 
 ### Configuration
 
-Create a `.env` file in the backend directory:
+Create an environment file in the backend directory (`backend/.env`):
 
 ```env
+# Server Configuration
 PORT=3333
-NODE_ENV=development
-MONGODB_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
-
-# API Keys
-PORT=3000
-REACT_APP_GOOGLE_API_KEY=your_google_key
 TICKETMASTER_API_KEY=your_ticketmaster_key
 SPOTIFY_CLIENT_ID=your_spotify_client_id
 SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
 GOOGLE_API_KEY=your_google_key
 OPENWEATHER_API_KEY=your_openweather_key
-```
+NODE_ENV=development
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
 
-The backend server will run on `http://localhost:3333` and the frontend development server on `http://localhost:3000`.
+
+Note: Never commit your actual API keys to version control. The above values are examples only.
 
 ### Required API Keys:
 
@@ -127,15 +134,8 @@ This will run:
 - **User Features**
   - User authentication
   - Save favorite events
-  - Personalized event recommendations
-
-## Future Enhancements
-
-- Mobile app version
-- Event recommendations based on user preferences
-- Social features for sharing events
-- Ticket price tracking and alerts
-- Integration with more event providers
+  - Dark/Light mode theme
+  - Responsive design
 
 ## License
 
@@ -148,6 +148,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+## Questions
+
+For any questions, please open an issue on GitHub.
 
 ## Acknowledgments
 

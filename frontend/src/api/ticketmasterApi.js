@@ -24,25 +24,34 @@ export const searchEvents = async (city) => {
 
 export const saveEvent = async (eventData) => {
 	try {
-		console.log('Attempting to save event:', eventData); // Debug log
+		console.log('Attempting to save event:', eventData);
 		const response = await fetch(`${API_URL}/events/save`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${localStorage.getItem('token')}`
+				Authorization: `Bearer ${localStorage.getItem('token')}`,
 			},
-			body: JSON.stringify({ eventData })
+			body: JSON.stringify({
+				eventId: eventData.id,
+				name: eventData.name,
+				date: eventData.dates.start.localDate,
+				venue:
+					eventData._embedded?.venues?.[0]?.name || 'Unknown Venue',
+				city:
+					eventData._embedded?.venues?.[0]?.city?.name ||
+					'Unknown City',
+				imageUrl: eventData.images?.[0]?.url,
+				ticketUrl: eventData.url,
+				eventData: eventData, // Store the full event data
+			}),
 		});
-		
-		const data = await response.json();
-		
+
 		if (!response.ok) {
-			console.error('Save event error:', data); // Debug log
+			const data = await response.json();
 			throw new Error(data.message || 'Failed to save event');
 		}
-		
-		console.log('Save event response:', data); // Debug log
-		return data;
+
+		return await response.json();
 	} catch (error) {
 		console.error('Error saving event:', error);
 		throw error;
@@ -54,17 +63,17 @@ export const getSavedEvents = async () => {
 		console.log('Fetching saved events'); // Debug log
 		const response = await fetch(`${API_URL}/events/saved`, {
 			headers: {
-				'Authorization': `Bearer ${localStorage.getItem('token')}`
-			}
+				Authorization: `Bearer ${localStorage.getItem('token')}`,
+			},
 		});
-		
+
 		const data = await response.json();
-		
+
 		if (!response.ok) {
 			console.error('Get saved events error:', data); // Debug log
 			throw new Error(data.message || 'Failed to fetch saved events');
 		}
-		
+
 		console.log('Get saved events response:', data); // Debug log
 		return data;
 	} catch (error) {
@@ -78,14 +87,14 @@ export const unsaveEvent = async (eventId) => {
 		const response = await fetch(`${API_URL}/events/saved/${eventId}`, {
 			method: 'DELETE',
 			headers: {
-				'Authorization': `Bearer ${localStorage.getItem('token')}`
-			}
+				Authorization: `Bearer ${localStorage.getItem('token')}`,
+			},
 		});
-		
+
 		if (!response.ok) {
 			throw new Error('Failed to unsave event');
 		}
-		
+
 		return await response.json();
 	} catch (error) {
 		console.error('Error unsaving event:', error);

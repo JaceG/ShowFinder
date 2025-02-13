@@ -1,80 +1,124 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
-const mongoose = require('mongoose');
-const eventsRouter = require('./routes/events');
 const path = require('path');
-const googleRouter = require('./routes/google');
-const weatherRouter = require('./routes/weather');
-const spotifyRouter = require('./routes/spotify');
-const userRouter = require('./routes/users');
+const connectDB = require('./config/db');
+const config = require('./config/config');
+const errorHandler = require('./middleware/errorHandler');
+const weatherRoutes = require('./routes/weather');
+const spotifyRoutes = require('./routes/spotify');
+const googleRoutes = require('./routes/google');
+const eventRoutes = require('./routes/events');
+const userRoutes = require('./routes/users');
 
 const app = express();
-const PORT = process.env.PORT || 3333;
 
-// Add CSP headers middleware before other middleware
-app.use((req, res, next) => {
-	res.setHeader(
-		'Content-Security-Policy',
-		"default-src 'self'; " +
-			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-			"font-src 'self' https://fonts.gstatic.com; " +
-			"img-src 'self' data: https:; " +
-			"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com; " +
-			"frame-src 'self' https://www.youtube.com; " +
-			"connect-src 'self' https://app.ticketmaster.com https://*.googleapis.com https://openweathermap.org;"
-	);
-	next();
-});
+// Body parser middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// CORS middleware
+// CORS configuration
 app.use(
 	cors({
-		origin:
-			process.env.NODE_ENV === 'production'
-				? true // Allow all origins in production
-				: 'http://localhost:3000',
+		origin: [
+			'https://showfinder-mnz5.onrender.com',
+			'http://localhost:3000',
+		],
+		credentials: true,
 		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 		allowedHeaders: ['Content-Type', 'Authorization'],
-		credentials: true,
 	})
 );
 
-// Parse JSON bodies
-app.use(express.json());
+// Request logging
+app.use((req, res, next) => {
+	console.log(`${req.method} ${req.path}`);
+	next();
+});
 
-// Serve static files from the React frontend app
+// Enhanced error logging middleware
+app.use((req, res, next) => {
+	console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+	const oldSend = res.send;
+	res.send = function (data) {
+		console.log(
+			`Response for ${req.method} ${req.url}: Status ${res.statusCode}`
+		);
+		return oldSend.apply(res, arguments);
+	};
+	next();
+});
+
+// API routes
+app.use('/api/weather', weatherRoutes);
+app.use('/api/spotify', spotifyRoutes);
+app.use('/api/google', googleRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/users', userRoutes);
+
+// Handle 404s for API routes
+app.use('/api/*', (req, res) => {
+	res.status(404).json({ error: 'API endpoint not found' });
+});
+
+// Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 
-// Update MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eventapp')
-	.then(() => console.log('Connected to MongoDB'))
-	.catch(err => console.error('MongoDB connection error:', err));
-
-// Basic health check route
-app.get('/api/health', (req, res) => {
-	res.json({ status: 'OK' });
-});
-
-// Events routes
-app.use('/api/events', eventsRouter);
-app.use('/api/google', googleRouter);
-app.use('/api/weather', weatherRouter);
-app.use('/api/spotify', spotifyRouter);
-app.use('/api/users', userRouter);
-
-// Handle all other routes by serving the React app
+// The catchall handler
 app.get('*', (req, res) => {
-	res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+	console.log('Catch-all route hit for:', req.url);
+	res.sendFile(
+		path.join(__dirname, '../frontend/build/index.html'),
+		(err) => {
+			if (err) {
+				console.error('Error sending file:', err);
+				res.status(500).send(err);
+			}
+		}
+	);
 });
 
-// Error handling middleware
+// Global error handler
 app.use((err, req, res, next) => {
-	console.error(err.stack);
-	res.status(500).json({ error: 'Something broke!' });
+	console.error('Global error handler caught:', {
+		error: err.message,
+		stack: err.stack,
+		url: req.url,
+		method: req.method,
+	});
+	res.status(500).json({
+		error: 'Internal Server Error',
+		message: err.message,
+		path: req.url,
+	});
 });
 
-// Start server
-app.listen(PORT, () => {
-	console.log(`Server running on port ${PORT}`);
+// Catch unhandled rejections
+process.on('unhandledRejection', (reason, promise) => {
+	console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
+
+// Catch uncaught exceptions
+process.on('uncaughtException', (error) => {
+	console.error('Uncaught Exception:', error);
+});
+
+const PORT = config.port || 3333;
+
+// Server startup
+const startServer = async () => {
+	try {
+		await connectDB();
+		app.listen(PORT, () => {
+			console.log(`Server running on port ${PORT}`);
+			console.log(`Environment: ${config.nodeEnv}`);
+			console.log('Database connected');
+		});
+	} catch (error) {
+		console.error('Failed to start server:', error);
+		process.exit(1);
+	}
+};
+
+startServer();
+
+module.exports = app;
