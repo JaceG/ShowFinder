@@ -92,21 +92,35 @@ exports.saveEvent = async (req, res, next) => {
 exports.unsaveEvent = async (req, res, next) => {
 	try {
 		const { eventId } = req.params;
-		const user = await User.findById(req.user.id);
+		console.log('Attempting to unsave event with ID:', eventId);
 
+		const user = await User.findById(req.user.id);
 		if (!user) {
 			throw new AppError('User not found', 404);
 		}
 
-		// Remove event from user's saved events
+		// Find the event first
+		const event = await Event.findOne({ eventId: eventId });
+		console.log('Found event:', event);
+
+		if (!event) {
+			throw new AppError('Event not found', 404);
+		}
+
+		// Remove from user's saved events using the MongoDB _id
 		user.savedEvents = user.savedEvents.filter(
-			(id) => id.toString() !== eventId
+			(savedId) => savedId.toString() !== event._id.toString()
 		);
 		await user.save();
+		console.log('Updated user saved events:', user.savedEvents);
+
+		// Now remove the event itself
+		const deleteResult = await Event.findOneAndDelete({ eventId: eventId });
+		console.log('Delete result:', deleteResult);
 
 		res.json({ message: 'Event removed successfully' });
 	} catch (error) {
-		console.error('Error removing event:', error);
+		console.error('Error in unsaveEvent:', error);
 		next(error);
 	}
 };

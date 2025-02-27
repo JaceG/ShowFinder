@@ -57,7 +57,10 @@ function SavedEvents() {
 				{savedEvents.map((event) => (
 					<Grid item xs={12} sm={6} md={4} key={event.eventId}>
 						<EventCard
-							event={event.eventData}
+							event={{
+								...event.eventData,
+								id: event.eventId,
+							}}
 							saved={true}
 							onSaveToggle={handleSaveToggle}
 						/>
