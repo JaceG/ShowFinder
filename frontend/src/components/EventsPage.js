@@ -20,7 +20,7 @@ function EventsPage() {
 	const [genreFilter, setGenreFilter] = useState('all');
 	const [selectedEvent, setSelectedEvent] = useState(null);
 	const [savedEventIds, setSavedEventIds] = useState(new Set());
-	const { mode, toggleColorMode } = useTheme();
+	const { mode } = useTheme();
 
 	useEffect(() => {
 		const loadSavedEvents = async () => {

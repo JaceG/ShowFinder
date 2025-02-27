@@ -7,7 +7,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import Hotjar from '@hotjar/browser';
 
 // Initialize Hotjar
-const siteId = 5320792;
+const siteId = 5321183;
 const hotjarVersion = 6;
 Hotjar.init(siteId, hotjarVersion);
 
