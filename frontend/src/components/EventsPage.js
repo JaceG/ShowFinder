@@ -25,7 +25,7 @@ function EventsPage() {
 	useEffect(() => {
 		const loadSavedEvents = async () => {
 			try {
-				const { savedEvents } = await getSavedEvents();
+				const savedEvents = await getSavedEvents();
 				setSavedEventIds(
 					new Set(savedEvents.map((event) => event.eventId))
 				);
