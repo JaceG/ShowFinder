@@ -12,6 +12,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@hotjar/browser": "^1.0.9",
     "jsonwebtoken": "^9.0.2"
   },
   "main": "index.js",
